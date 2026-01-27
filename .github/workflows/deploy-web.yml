@@ -1,0 +1,76 @@
+# Deploy web app to VPS on push to main.
+# Repo root = apps/web. VPS: root@<VPS_IP>, frontend on port 6020, tmux session nrwrules-frontend.
+# Required secrets: VPS_IP, VPS_USER, VPS_PASSWORD
+
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dist
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+
+      - name: Ensure remote dir
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            mkdir -p /root/nrwrules/apps/web/dist
+
+      - name: Copy dist to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: 'index.html,assets'
+          target: '/root/nrwrules/apps/web/dist'
+          overwrite: true
+
+      - name: Restart frontend on VPS (tmux, port 6020)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            SITE_DIR="/root/nrwrules/apps/web"
+            tmux kill-session -t nrwrules-frontend 2>/dev/null || true
+            tmux new-session -d -s nrwrules-frontend "cd $SITE_DIR && npx serve -s dist -l 6020"
+            echo "Frontend (port 6020) restarted in tmux session nrwrules-frontend."
+            sleep 2
+            tmux list-sessions
+            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:6020 || true
