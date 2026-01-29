@@ -17,9 +17,31 @@ const communityMonitoring = baseApi.injectEndpoints({
       }),
       providesTags: ['Community', 'Admin'],
     }),
+    getReportedPosts: builder.query({
+      query: () => ({
+        url: '/reported-content-stats',
+        method: 'GET',
+      }),
+      providesTags: ['Community', 'Admin'],
+    }),
+    approveOrRemoveReportedPost: builder.mutation({
+      query: ({ id, action }) => ({
+        url: `/community/posts/moderate/${id}`,
+        method: 'POST',
+        body: {
+          action,
+        },
+      }),
+      invalidatesTags: ['Community', 'Admin'],
+    }),
   }),
 })
 
-export const { useGetCommunityStateCardsDataQuery, useGetCommunityPostsQuery } = communityMonitoring
+export const {
+  useGetCommunityStateCardsDataQuery,
+  useGetCommunityPostsQuery,
+  useGetReportedPostsQuery,
+  useApproveOrRemoveReportedPostMutation,
+} = communityMonitoring
 
 export default communityMonitoring

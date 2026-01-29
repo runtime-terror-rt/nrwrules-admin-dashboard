@@ -137,9 +137,9 @@ export function Community() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {displayStats.map((s) => (
-          <Card key={s.label}>
-            <p className="mb-1 text-sm text-gray-600">{s.label}</p>
-            <p className="text-2xl font-bold text-[var(--color-primary)]">{s.value}</p>
+          <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
+            <p className="mb-1 text-sm xl:text-base text-gray-600">{s.label}</p>
+            <p className="text-3xl xl:text-5xl font-bold text-[var(--color-primary)]">{s.value}</p>
           </Card>
         ))}
       </div>
@@ -307,8 +307,8 @@ function CommunityPostCard({ post, onCardClick, onDelete }: CommunityPostCardPro
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-gray-900">{post.author}</p>
-          <p className="flex items-center gap-1.5 text-xs text-gray-500">
+          <p className="text-sm xl:text-base font-semibold text-gray-900">{post.author}</p>
+          <p className="flex items-center gap-1.5 text-xs xl:text-sm text-gray-500">
             <Icon name="clock" size={14} className="shrink-0" />
             {post.timestamp}
           </p>
@@ -329,8 +329,8 @@ function CommunityPostCard({ post, onCardClick, onDelete }: CommunityPostCardPro
           </button>
         </div>
       </div>
-      <p className="text-sm text-gray-700 line-clamp-2">{post.content}</p>
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <p className="mt-2 text-sm xl:text-base text-gray-700 line-clamp-2">{post.content}</p>
+      <div className="flex items-center gap-4 text-xs xl:text-sm text-sky-400">
         <span className="flex items-center gap-1">
           <Icon name="message" size={14} className="shrink-0" />
           {post.commentEntries?.length ?? post.comments} Comments

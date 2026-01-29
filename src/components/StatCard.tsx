@@ -16,22 +16,22 @@ export type StatCardProps = StatCardData & {
  */
 function StatCardComponent({ label, value, change, positive, icon, bgClassName }: StatCardProps) {
   return (
-    <Card className={bgClassName}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="mb-1 text-sm text-gray-600">{label}</p>
-          <p className="text-2xl font-semibold text-[var(--color-primary)]">{value}</p>
-          <span
-            className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-              positive ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-            }`}
-          >
-            {change}
-          </span>
+    <Card className={`h-40 flex flex-col justify-around gap-5 ${bgClassName}`}>
+      <div className="h-full flex items-center justify-between gap-5">
+        <div className="min-w-0 flex-1 flex flex-col justify-around gap-5">
+          <p className="mb-1 text-sm xl:text-base text-gray-600">{label}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-3xl xl:text-5xl font-semibold text-(--color-primary)">{value}</p>
+            <span
+              className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                positive ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+              }`}
+            >
+              {change}
+            </span>
+          </div>
         </div>
-        {icon && (
-          <Icon name={icon} size={28} className="shrink-0 opacity-80" primary />
-        )}
+        {icon && <Icon name={icon} size={28} className="shrink-0 opacity-80" primary />}
       </div>
     </Card>
   )
