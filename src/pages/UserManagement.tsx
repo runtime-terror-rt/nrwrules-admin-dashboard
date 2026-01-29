@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
-  Icon,
   Input,
   Modal,
   PageHeader,
@@ -16,6 +16,7 @@ import type { User } from '../types'
 import {
   useGetDashboardCardsDataQuery,
   useGetDashboardUsersQuery,
+  useToggleUserStatusMutation,
 } from '../redux/features/api/admin/userManagement'
 
 type FilterStatus = 'all' | 'active' | 'deactivate'
@@ -50,6 +51,7 @@ export function UserManagement() {
 
   const { data: dashboardCardsData } = useGetDashboardCardsDataQuery({})
   const { data: allUsers } = useGetDashboardUsersQuery({})
+  const [toggleUserStatus] = useToggleUserStatusMutation()
   const [localUsers, setLocalUsers] = useState<User[]>([])
 
   useEffect(() => {
@@ -119,18 +121,10 @@ export function UserManagement() {
     setSelectedUser((u) => (u ? { ...u, role: u.role === 'admin' ? 'user' : 'admin' } : null))
   }
 
-  const handleToggleStatus = (user: User) => {
-    setLocalUsers((prev) =>
-      prev.map((u) =>
-        (u.id ?? u.email) === (user.id ?? user.email)
-          ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' }
-          : u
-      )
-    )
+  const handleToggleStatus = (user: any) => {
+    toggleUserStatus(user.id)
     setSelectedUser((u) =>
-      u && (u.id ?? u.email) === (user.id ?? user.email)
-        ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' }
-        : u
+      u ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' } : null
     )
   }
 
@@ -159,25 +153,7 @@ export function UserManagement() {
 
   return (
     <>
-      <PageHeader
-        title="User Management"
-        subtitle="User Management"
-        description="Manage users, roles, and access."
-        action={
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            onClick={() => setShowAddModal(true)}
-            className="shrink-0"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Icon name="plus" size={18} />
-              Add user
-            </span>
-          </Button>
-        }
-      />
+      <PageHeader title="User Management" description="Manage users, roles, and access." />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <SearchInput
@@ -232,7 +208,11 @@ export function UserManagement() {
       </div>
 
       <PageTitle as={2}>User Directory</PageTitle>
-      <UserDirectoryTable users={filteredUsers} onRowClick={setSelectedUser} />
+      <UserDirectoryTable
+        users={filteredUsers}
+        onRowClick={setSelectedUser}
+        toggleUserStatus={handleToggleStatus}
+      />
 
       {/* User details modal — view details, Edit / Delete / Make Admin / Deactivate */}
       <Modal

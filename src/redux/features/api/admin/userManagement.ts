@@ -16,9 +16,20 @@ const userManagement = baseApi.injectEndpoints({
       }),
       providesTags: ['Admin'],
     }),
+    toggleUserStatus: builder.mutation({
+      query: (userId: string) => ({
+        url: `/users/toggle-block/${userId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Admin'],
+    }),
   }),
 })
 
-export const { useGetDashboardCardsDataQuery, useGetDashboardUsersQuery } = userManagement
+export const {
+  useGetDashboardCardsDataQuery,
+  useGetDashboardUsersQuery,
+  useToggleUserStatusMutation,
+} = userManagement
 
 export default userManagement
