@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Icon,
@@ -13,10 +13,28 @@ import {
 import { theme } from '../constants'
 import { adminDashboardStats, adminDashboardUsers } from '../data'
 import type { User } from '../types'
+import {
+  useGetDashboardCardsDataQuery,
+  useGetDashboardUsersQuery,
+} from '../redux/features/api/admin/userManagement'
 
 type FilterStatus = 'all' | 'active' | 'deactivate'
 type FilterPhase = 'all' | 'pregnancy' | 'postpartum'
 type FilterDelivery = 'all' | 'vaginal' | 'cesarean' | '—'
+
+interface BackendUser {
+  user_id: number
+  pregnancy_status: string
+  delivery_type: string | null
+  user: {
+    first_name: string
+    last_name: string
+    email: string
+    is_blocked: boolean
+    last_seen: string | null
+    role?: string
+  }
+}
 
 /**
  * User Management — Figma node 3468-1203.
@@ -29,15 +47,52 @@ export function UserManagement() {
   const [filterDelivery, setFilterDelivery] = useState<FilterDelivery>('all')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [users, setUsers] = useState<User[]>(adminDashboardUsers)
+
+  const { data: dashboardCardsData } = useGetDashboardCardsDataQuery({})
+  const { data: allUsers } = useGetDashboardUsersQuery({})
+  const [localUsers, setLocalUsers] = useState<User[]>([])
+
+  useEffect(() => {
+    if (allUsers?.data) {
+      const mappedUsers = allUsers.data.map((item: BackendUser) => ({
+        id: String(item.user_id),
+        name: `${item.user?.first_name || ''} ${item.user?.last_name || ''}`.trim() || 'Anonymous',
+        email: item.user?.email || 'N/A',
+        status: item.user?.is_blocked ? 'deactivate' : 'active',
+        phase: item.pregnancy_status || '—',
+        delivery: item.delivery_type || '—',
+        lastActivity: item.user?.last_seen
+          ? new Date(item.user.last_seen).toLocaleDateString('en-GB')
+          : '—',
+        role: (item.user?.role?.toLowerCase() === 'admin' ? 'admin' : 'user') as 'admin' | 'user',
+      }))
+      setLocalUsers(mappedUsers)
+    } else {
+      setLocalUsers(adminDashboardUsers)
+    }
+  }, [allUsers])
+
+  const displayStats = useMemo(() => {
+    if (!dashboardCardsData?.data) return adminDashboardStats
+    return [
+      { ...adminDashboardStats[0], value: dashboardCardsData.data.total_users ?? 0 },
+      { ...adminDashboardStats[1], value: dashboardCardsData.data.active_users ?? 0 },
+      { ...adminDashboardStats[2], value: dashboardCardsData.data.ai_chat_logs ?? 0 },
+      {
+        ...adminDashboardStats[3],
+        value: `${dashboardCardsData.data.postpartum_percentage ?? 0}`,
+      },
+    ]
+  }, [dashboardCardsData])
 
   const filteredUsers = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return users.filter((u) => {
+    return localUsers.filter((u) => {
       if (q && !u.name.toLowerCase().includes(q) && !u.email.toLowerCase().includes(q)) return false
       if (filterStatus !== 'all' && u.status !== filterStatus) return false
       if (filterPhase === 'pregnancy' && !u.phase.toLowerCase().includes('pregnancy')) return false
-      if (filterPhase === 'postpartum' && !u.phase.toLowerCase().includes('postpartum')) return false
+      if (filterPhase === 'postpartum' && !u.phase.toLowerCase().includes('postpartum'))
+        return false
       if (filterDelivery !== 'all') {
         const d = u.delivery.toLowerCase()
         if (filterDelivery === '—' && d !== '—') return false
@@ -46,31 +101,37 @@ export function UserManagement() {
       }
       return true
     })
-  }, [users, search, filterStatus, filterPhase, filterDelivery])
+  }, [localUsers, search, filterStatus, filterPhase, filterDelivery])
 
   const handleDeleteUser = (user: User) => {
-    setUsers((prev) => prev.filter((u) => (u.id ?? u.email) !== (user.id ?? user.email)))
+    setLocalUsers((prev) => prev.filter((u) => (u.id ?? u.email) !== (user.id ?? user.email)))
     setSelectedUser(null)
   }
 
   const handleMakeAdmin = (user: User) => {
-    setUsers((prev) =>
+    setLocalUsers((prev) =>
       prev.map((u) =>
-        (u.id ?? u.email) === (user.id ?? user.email) ? { ...u, role: (u.role === 'admin' ? 'user' : 'admin') as 'user' | 'admin' } : u
+        (u.id ?? u.email) === (user.id ?? user.email)
+          ? { ...u, role: (u.role === 'admin' ? 'user' : 'admin') as 'user' | 'admin' }
+          : u
       )
     )
     setSelectedUser((u) => (u ? { ...u, role: u.role === 'admin' ? 'user' : 'admin' } : null))
   }
 
   const handleToggleStatus = (user: User) => {
-    setUsers((prev) =>
+    setLocalUsers((prev) =>
       prev.map((u) =>
         (u.id ?? u.email) === (user.id ?? user.email)
           ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' }
           : u
       )
     )
-    setSelectedUser((u) => (u && (u.id ?? u.email) === (user.id ?? user.email) ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' } : u))
+    setSelectedUser((u) =>
+      u && (u.id ?? u.email) === (user.id ?? user.email)
+        ? { ...u, status: u.status === 'active' ? 'deactivate' : 'active' }
+        : u
+    )
   }
 
   const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
@@ -79,7 +140,7 @@ export function UserManagement() {
     const name = (form.elements.namedItem('name') as HTMLInputElement)?.value
     const email = (form.elements.namedItem('email') as HTMLInputElement)?.value
     if (!name || !email) return
-    setUsers((prev) => [
+    setLocalUsers((prev) => [
       ...prev,
       {
         id: String(Date.now()),
@@ -159,7 +220,7 @@ export function UserManagement() {
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {adminDashboardStats.map((s) => (
+        {displayStats.map((s) => (
           <StatCard
             key={s.label}
             label={s.label}
@@ -234,13 +295,19 @@ export function UserManagement() {
       <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Add user">
         <form onSubmit={handleAddUser} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Name
             </label>
             <Input name="name" placeholder="Full name" required />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Email
             </label>
             <Input name="email" type="email" placeholder="you@example.com" required />

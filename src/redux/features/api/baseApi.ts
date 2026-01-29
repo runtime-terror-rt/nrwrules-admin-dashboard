@@ -46,6 +46,7 @@ export const baseApi = createApi({
   baseQuery: dynamicBaseQuery,
   tagTypes: [
     'User',
+    'Admin',
     'Products',
     'Profile',
     'Dashboard',

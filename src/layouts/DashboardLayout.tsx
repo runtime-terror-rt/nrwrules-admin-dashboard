@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from '../components'
 import { useAuth } from '../hooks/useAuth'

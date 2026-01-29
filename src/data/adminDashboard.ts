@@ -5,7 +5,7 @@ export const adminDashboardStats: StatCardData[] = [
   { label: 'Total Users', value: 40, change: '+5.2%', positive: true },
   { label: 'Active Users', value: 20, change: '+50%', positive: true },
   { label: 'AI Chat Logs', value: 13, change: '+18.7%', positive: true },
-  { label: 'Postpartum Segment', value: '45%', change: '-2.2%', positive: false },
+  { label: 'Postpartum Segment', value: '', change: '-2.2%', positive: false },
 ]
 
 /** User directory rows in exact Figma order */
