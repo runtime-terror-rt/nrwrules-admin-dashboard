@@ -3,6 +3,8 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ASSETS, theme, type IconName } from '../../constants'
 import type { NavItem, CurrentUser } from '../../types'
 import { Icon } from '../ui'
+import { useAppDispatch } from '../../redux/store/hooks'
+import { logOut } from '../../redux/features/slice/authSlice'
 
 export interface SidebarProps {
   brand: string
@@ -21,9 +23,18 @@ const SIDEBAR_HEIGHT_OFFSET = SIDEBAR_MARGIN * 2
 function SidebarComponent({ brand, navItems, user }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const [cmsExpanded, setCmsExpanded] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('adminUser')
+    dispatch(logOut())
+    setUserMenuOpen(false)
+    navigate('/sign-in')
+  }
 
   useEffect(() => {
     if (!userMenuOpen) return
@@ -106,7 +117,9 @@ function SidebarComponent({ brand, navItems, user }: SidebarProps) {
                     <Icon name={(item.icon as IconName) || 'users'} size={20} primary />
                   </span>
                   <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                  <span className={`shrink-0 transition-transform ${cmsExpanded ? 'rotate-180' : ''}`}>
+                  <span
+                    className={`shrink-0 transition-transform ${cmsExpanded ? 'rotate-180' : ''}`}
+                  >
                     <Icon name="chevron-down" size={16} primary />
                   </span>
                 </button>
@@ -244,10 +257,7 @@ function SidebarComponent({ brand, navItems, user }: SidebarProps) {
             <button
               type="button"
               role="menuitem"
-              onClick={() => {
-                setUserMenuOpen(false)
-                navigate('/sign-in')
-              }}
+              onClick={handleLogout}
               className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
             >
               <Icon name="x" size={18} />

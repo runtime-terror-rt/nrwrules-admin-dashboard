@@ -25,35 +25,33 @@
 //   endpoints: () => ({}),
 // });
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const dynamicBaseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1',
   // credentials: "include", // optional if backend needs cookies
   prepareHeaders: (headers) => {
-    if (typeof window !== "undefined") {
-      // const token = localStorage.getItem("token"); // your JWT from login
-      const token = Cookies.get("token");
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken')
       if (token) {
-        headers.set("authorization", `Bearer ${token}`);
+        headers.set('authorization', `Bearer ${token}`)
       }
     }
-    return headers;
+    return headers
   },
-});
+})
 
 export const baseApi = createApi({
-  reducerPath: "baseApi",
+  reducerPath: 'baseApi',
   baseQuery: dynamicBaseQuery,
   tagTypes: [
-    "User",
-    "Products",
-    "Profile",
-    "Dashboard",
-    "Hydration",
-    "Community",
-    "Recommendations",
+    'User',
+    'Products',
+    'Profile',
+    'Dashboard',
+    'Hydration',
+    'Community',
+    'Recommendations',
   ],
   endpoints: () => ({}),
-});
+})

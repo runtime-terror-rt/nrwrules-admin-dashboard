@@ -2,19 +2,34 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ASSETS, theme } from '../constants'
 import { Button, Input } from '../components/ui'
+import { useLoginMutation } from '../redux/features/api/auth/authApi'
+import { useAppDispatch } from '../redux/store/hooks'
+import { setUser } from '../redux/features/slice/authSlice'
 
 /**
  * Sign In — Figma design system: page bg, white card, primary button.
  */
 export function SignIn() {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [login, { isLoading, error }] = useLoginMutation()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: auth — for now redirect to dashboard
-    navigate('/user-management', { replace: true })
+    try {
+      const result = await login({ email, password }).unwrap()
+      // result is { success: true, message: "...", data: { token: "...", user: { ... } } }
+      if (result.data?.token) {
+        localStorage.setItem('accessToken', result.data.token)
+        localStorage.setItem('adminUser', JSON.stringify(result.data.user))
+        dispatch(setUser(result.data.user))
+        navigate('/user-management', { replace: true })
+      }
+    } catch (err) {
+      console.error('Failed to login:', err)
+    }
   }
 
   return (
@@ -35,15 +50,28 @@ export function SignIn() {
             Mamabot
           </span>
         </div>
-        <h1 className="mb-1 text-center text-2xl font-bold" style={{ color: theme.color.secondary }}>
+        <h1
+          className="mb-1 text-center text-2xl font-bold"
+          style={{ color: theme.color.secondary }}
+        >
           Sign in
         </h1>
         <p className="mb-6 text-center text-sm" style={{ color: theme.color.textSecondary }}>
           Enter your credentials to access the dashboard.
         </p>
+
+        {error && (
+          <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-500">
+            {'data' in (error as any) ? (error as any).data.message : 'Login failed'}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Email
             </label>
             <Input
@@ -56,7 +84,10 @@ export function SignIn() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Password
             </label>
             <Input
@@ -77,8 +108,8 @@ export function SignIn() {
               Forgot password?
             </Link>
           </div>
-          <Button type="submit" variant="primary" size="lg" className="w-full">
-            Sign in
+          <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
       </div>

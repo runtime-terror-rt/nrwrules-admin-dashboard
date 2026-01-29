@@ -1,10 +1,10 @@
-import { useAppSelector } from "@/redux/store/hooks";
+import { useAppSelector } from '../redux/store/hooks'
 
 export const useAuth = () => {
-  const { user } = useAppSelector((state) => state.auth);
-  
+  const { user } = useAppSelector((state) => state.auth)
+
   return {
     user,
     isAuthenticated: !!user,
-  };
-};
+  }
+}
