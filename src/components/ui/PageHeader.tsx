@@ -20,7 +20,9 @@ function PageHeaderComponent({ title, description, action }: PageHeaderProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <PageTitle as={1}>{title}</PageTitle>
+        <PageTitle className="text-[#229ECF]!" as={1}>
+          {title}
+        </PageTitle>
         {description && <p className="text-text-secondary">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

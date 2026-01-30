@@ -24,7 +24,7 @@ const WebSettings = lazy(() =>
   import('./pages/WebSettings').then((m) => ({ default: m.WebSettings }))
 )
 const CmsServices = lazy(() =>
-  import('./pages/cms/Services').then((m) => ({ default: m.CmsServices }))
+  import('./pages/cms/Services').then((m) => ({ default: m.Services }))
 )
 const CmsSupport = lazy(() =>
   import('./pages/cms/Support').then((m) => ({ default: m.CmsSupport }))
