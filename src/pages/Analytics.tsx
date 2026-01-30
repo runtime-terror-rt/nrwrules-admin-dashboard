@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, PageHeader, PageTitle, StatCard } from '../components'
-import {
-  dailySummaryCards,
-  featureEngagementData,
-  keyInsights,
-  userActivityByPhaseData,
-  type StatItem,
-} from '../data'
+import { dailySummaryCards, keyInsights, userActivityByPhaseData, type StatItem } from '../data'
 import { useGetAnalyticsDataQuery } from '../redux/features/api/admin/communityMonitoring'
 import {
   BarChart,
