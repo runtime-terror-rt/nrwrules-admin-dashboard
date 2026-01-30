@@ -34,6 +34,10 @@ const communityMonitoring = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Community', 'Admin'],
     }),
+    getAnalyticsData: builder.query({
+      query: () => `/analytics/dashboard`,
+      providesTags: ['Admin'],
+    }),
   }),
 })
 
@@ -42,6 +46,7 @@ export const {
   useGetCommunityPostsQuery,
   useGetReportedPostsQuery,
   useApproveOrRemoveReportedPostMutation,
+  useGetAnalyticsDataQuery,
 } = communityMonitoring
 
 export default communityMonitoring
