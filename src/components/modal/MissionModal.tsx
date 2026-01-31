@@ -39,7 +39,15 @@ const MissionModal = ({
         description: initialData.description || '',
         sortOrder: initialData.sort_order || 0,
       })
-      setPreview(initialData.icon || null)
+      setPreview(initialData.icon_url || null)
+    } else {
+      setForm({
+        title: '',
+        description: '',
+        sortOrder: 0,
+      })
+      setPreview(null)
+      setIcon(null)
     }
   }, [initialData, open])
 

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { theme } from '../../constants'
 import { useCreateUpdateJourneyMutation } from '../../redux/features/api/admin/journey'
+import { toast } from 'sonner'
 
 const JourneyModal = ({
   children,
@@ -17,7 +18,7 @@ const JourneyModal = ({
   children: React.ReactNode
   initialData?: any
 }) => {
-  const [createUpdate] = useCreateUpdateJourneyMutation()
+  const [createUpdate, { isLoading }] = useCreateUpdateJourneyMutation()
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -45,6 +46,17 @@ const JourneyModal = ({
         locale: initialData.locale || 'en',
       })
       setPreviews({ p1: initialData.image_url_1 || '', p2: initialData.image_url_2 || '' })
+    } else {
+      setForm({
+        title: '',
+        description: '',
+        count: '',
+        subtitle_1: '',
+        subtitle_2: '',
+        locale: 'en',
+      })
+      setPreviews({ p1: '', p2: '' })
+      setImages({ img1: null, img2: null })
     }
   }, [initialData, open])
 
@@ -68,6 +80,7 @@ const JourneyModal = ({
 
     await createUpdate(formData).unwrap()
     setOpen(false)
+    toast.success('Journey saved successfully')
   }
 
   return (
@@ -94,6 +107,7 @@ const JourneyModal = ({
             />
             <input
               placeholder="Count (e.g. 300)"
+              type="number"
               value={form.count}
               onChange={(e) => setForm({ ...form, count: e.target.value })}
               className="w-full border p-2 rounded-lg"
@@ -139,10 +153,11 @@ const JourneyModal = ({
         <div className="flex gap-3 mt-6">
           <button
             onClick={handleSubmit}
+            disabled={isLoading}
             className="px-6 py-2 text-white rounded-lg"
             style={{ backgroundColor: theme.color.primary }}
           >
-            Save Journey
+            {isLoading ? 'Saving...' : 'Save Journey'}
           </button>
           <button
             onClick={() => setOpen(false)}
