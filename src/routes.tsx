@@ -26,9 +26,9 @@ const WebSettings = lazy(() =>
 const CmsServices = lazy(() =>
   import('./pages/cms/Services').then((m) => ({ default: m.Services }))
 )
-const CmsSupport = lazy(() =>
-  import('./pages/cms/Support').then((m) => ({ default: m.CmsSupport }))
-)
+// const CmsSupport = lazy(() =>
+//   import('./pages/cms/Support').then((m) => ({ default: m.CmsSupport }))
+// )
 const CmsTeam = lazy(() => import('./pages/cms/Team').then((m) => ({ default: m.CmsTeam })))
 const CmsTestimonials = lazy(() =>
   import('./pages/cms/Testimonials').then((m) => ({ default: m.CmsTestimonials }))
@@ -154,14 +154,14 @@ export function AppRouter() {
                 </LazyPage>
               }
             />
-            <Route
+            {/* <Route
               path="cms/support"
               element={
                 <LazyPage>
                   <CmsSupport />
                 </LazyPage>
               }
-            />
+            /> */}
             <Route
               path="cms/team"
               element={

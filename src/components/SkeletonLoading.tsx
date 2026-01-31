@@ -8,7 +8,11 @@ const SkeletonLoading = ({
   direction?: 'horizontal' | 'vertical'
 }) => {
   return (
-    <div className={direction === 'horizontal' ? 'flex justify-between gap-3' : 'space-y-3'}>
+    <div
+      className={
+        direction === 'horizontal' ? 'w-full flex justify-between gap-3' : 'w-full space-y-3'
+      }
+    >
       {Array.from({ length: count }).map((_, index) => (
         <Skeleton
           key={index}
