@@ -5,7 +5,7 @@ import {
   useGetTeamsQuery,
   useUpsertTeamMemberMutation,
 } from '@/redux/features/api/admin/team'
-import { Edit, Loader2, Trash2, User } from 'lucide-react'
+import { Edit, Trash2, User } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 const TeamMemberModal = ({ onClose, initialData }: any) => {
@@ -19,7 +19,7 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
     twitter_link: '',
     status: '1',
   })
-  const [file, setFile] = useState(null)
+  const [file, setFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (initialData) {
@@ -134,7 +134,7 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
                   <input
                     type="file"
                     className="hidden"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
                   />
                   <span>Click or drag image here</span>
                 </label>
