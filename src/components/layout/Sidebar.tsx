@@ -5,6 +5,7 @@ import type { NavItem, CurrentUser } from '../../types'
 import { Icon } from '../ui'
 import { useAppDispatch } from '../../redux/store/hooks'
 import { logOut } from '../../redux/features/slice/authSlice'
+import { useLogOutMutation } from '@/redux/features/api/auth/authApi'
 
 export interface SidebarProps {
   brand: string
@@ -27,8 +28,10 @@ function SidebarComponent({ brand, navItems, user }: SidebarProps) {
   const [cmsExpanded, setCmsExpanded] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const [logout] = useLogOutMutation()
 
   const handleLogout = () => {
+    logout()
     localStorage.removeItem('accessToken')
     localStorage.removeItem('adminUser')
     dispatch(logOut())

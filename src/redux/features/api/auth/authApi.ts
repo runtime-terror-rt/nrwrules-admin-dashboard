@@ -8,7 +8,7 @@
 //   RegisterResponse,
 // } from "@/types/auth/authType";
 
-import { baseApi } from "../baseApi";
+import { baseApi } from '../baseApi'
 
 // export const authApi = baseApi.injectEndpoints({
 //   endpoints: (builder) => ({
@@ -79,106 +79,106 @@ import { baseApi } from "../baseApi";
 // export const { useLoginMutation, useRegisterMutation } = authApi;
 
 export interface IUser {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role?: "admin" | "customer";
-  is_verified?: boolean;
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  role?: 'admin' | 'customer'
+  is_verified?: boolean
 }
 
 export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
+  success: boolean
+  message: string
+  data: T
 }
 
 export interface IRegisterInput {
-  firstName: string;
-  lastName: string;
-  email: string;
-  companyName: string;
-  street: string;
-  city: string;
-  zip: string;
-  country: string;
-  phoneNumber: string;
-  vatUid?: string;
-  companyRegistrationNumber?: string;
-  password: string;
-  subject?: string;
+  firstName: string
+  lastName: string
+  email: string
+  companyName: string
+  street: string
+  city: string
+  zip: string
+  country: string
+  phoneNumber: string
+  vatUid?: string
+  companyRegistrationNumber?: string
+  password: string
+  subject?: string
 }
 
 export interface ILoginResponse {
-  token: string;
-  user: IUser;
+  token: string
+  user: IUser
 }
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.mutation({
       query: (formData) => ({
-        url: "/register",
-        method: "POST",
+        url: '/register',
+        method: 'POST',
         body: formData,
       }),
     }),
 
     verifyEmail: builder.mutation({
       query: (body) => ({
-        url: "/resend-otp",
-        method: "POST",
+        url: '/resend-otp',
+        method: 'POST',
         body,
       }),
     }),
 
     login: builder.mutation({
       query: (body) => ({
-        url: "/login",
-        method: "POST",
+        url: '/login',
+        method: 'POST',
         body,
       }),
     }),
 
     verifyOtp: builder.mutation({
       query: (body) => ({
-        url: "/verify-otp",
-        method: "POST",
+        url: '/verify-otp',
+        method: 'POST',
         body,
       }),
     }),
 
     forgotPassword: builder.mutation({
       query: (body) => ({
-        url: "/forgot-password",
-        method: "POST",
+        url: '/forgot-password',
+        method: 'POST',
         body,
       }),
     }),
 
     resetPassword: builder.mutation({
       query: (body) => ({
-        url: "/reset-password",
-        method: "POST",
+        url: '/reset-password',
+        method: 'POST',
         body,
       }),
     }),
 
     getCurrentUser: builder.query({
       query: () => ({
-        url: "/user/me",
-        method: "GET",
+        url: '/user-dashboard',
+        method: 'GET',
       }),
     }),
 
-   logOut: builder.mutation<void, void>({
-  query: () => ({
-    url: "/logout",
-    method: "POST",
+    logOut: builder.mutation<void, void>({
+      query: () => ({
+        url: '/logout',
+        method: 'POST',
+      }),
+    }),
   }),
-}),
-  }),
-});
+})
 
 export const {
   useSignupMutation,
@@ -189,5 +189,5 @@ export const {
   useResetPasswordMutation,
   useGetCurrentUserQuery,
   useLogOutMutation,
-} = authApi;
-export default authApi;
+} = authApi
+export default authApi

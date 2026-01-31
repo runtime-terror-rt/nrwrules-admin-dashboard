@@ -102,5 +102,12 @@ export default function ProtectedRoute() {
     return <Navigate to="/sign-in" state={{ from: location }} replace />
   }
 
+  // If user is not an admin, redirect to sign-in
+  if (user && user.role?.toLowerCase() !== 'admin') {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('adminUser')
+    return <Navigate to="/sign-in" replace />
+  }
+
   return <Outlet />
 }
