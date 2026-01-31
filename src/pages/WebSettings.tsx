@@ -42,6 +42,7 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 
 export function WebSettings() {
   const { data } = useGetWebSettingDataQuery()
+
   const [updateWebSetting, { data: updateData, isLoading }] = useUpdateWebSettingMutation()
 
   const [form, setForm] = useState<WebSetting | null>(null)
@@ -71,6 +72,23 @@ export function WebSettings() {
       })
     }
   }, [data])
+
+  if (!data?.data) {
+    return (
+      <div className="p-5 xl:p-8">
+        <PageHeader
+          title="Web Settings"
+          subtitle="Web Settings"
+          description="Manage general site information, contacts, and SEO."
+        />
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-pulse  border-primary">
+            Server issue occurred. Please try again later.
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleChange = (key: keyof WebSetting, value: string) => {
     setForm((prev) => ({ ...prev!, [key]: value }))

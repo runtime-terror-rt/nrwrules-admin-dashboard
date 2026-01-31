@@ -48,6 +48,8 @@ export const baseApi = createApi({
     'User',
     'Admin',
     'Service',
+    'Notification',
+    'ReportedPost',
     'Products',
     'Profile',
     'Dashboard',

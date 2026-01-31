@@ -8,21 +8,21 @@ const communityMonitoring = baseApi.injectEndpoints({
         url: '/community-stats',
         method: 'GET',
       }),
-      providesTags: ['Community', 'Admin'],
+      providesTags: ['Community'],
     }),
     getCommunityPosts: builder.query({
       query: () => ({
         url: '/community/posts/1',
         method: 'GET',
       }),
-      providesTags: ['Community', 'Admin'],
+      providesTags: ['Community'],
     }),
     getReportedPosts: builder.query({
       query: () => ({
         url: '/reported-content-stats',
         method: 'GET',
       }),
-      providesTags: ['Community', 'Admin'],
+      providesTags: ['ReportedPost'],
     }),
     approveOrRemoveReportedPost: builder.mutation({
       query: ({ id, action }) => ({
@@ -32,11 +32,26 @@ const communityMonitoring = baseApi.injectEndpoints({
           action,
         },
       }),
-      invalidatesTags: ['Community', 'Admin'],
+      invalidatesTags: ['ReportedPost'],
     }),
     getAnalyticsData: builder.query({
       query: () => `/analytics/dashboard`,
       providesTags: ['Admin'],
+    }),
+    getAnnouncements: builder.query({
+      query: () => `/global-notification-list`,
+      providesTags: ['Notification'],
+    }),
+    createAnnouncement: builder.mutation({
+      query: ({ title, message }) => ({
+        url: `/global-notification`,
+        method: 'POST',
+        body: {
+          title,
+          message,
+        },
+      }),
+      invalidatesTags: ['Notification'],
     }),
   }),
 })
@@ -47,6 +62,8 @@ export const {
   useGetReportedPostsQuery,
   useApproveOrRemoveReportedPostMutation,
   useGetAnalyticsDataQuery,
+  useGetAnnouncementsQuery,
+  useCreateAnnouncementMutation,
 } = communityMonitoring
 
 export default communityMonitoring
