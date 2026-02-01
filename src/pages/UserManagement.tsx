@@ -157,45 +157,49 @@ export function UserManagement() {
     <>
       <PageHeader title="User Management" description="Manage users, roles, and access." />
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <SearchInput
-          placeholder="Search users by name or email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[220px] max-w-xl flex-1"
-        />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-          className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
-          aria-label="Filter by status"
-        >
-          <option value="all">All status</option>
-          <option value="active">Active</option>
-          <option value="deactivate">Deactivate</option>
-        </select>
-        <select
-          value={filterPhase}
-          onChange={(e) => setFilterPhase(e.target.value as FilterPhase)}
-          className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
-          aria-label="Filter by phase"
-        >
-          <option value="all">All phases</option>
-          <option value="pregnancy">Pregnancy</option>
-          <option value="postpartum">Postpartum</option>
-        </select>
-        <select
-          value={filterDelivery}
-          onChange={(e) => setFilterDelivery(e.target.value as FilterDelivery)}
-          className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
-          aria-label="Filter by delivery"
-        >
-          <option value="all">All delivery</option>
-          <option value="vaginal">Vaginal</option>
-          <option value="cesarean">Cesarean</option>
-          <option value="—">—</option>
-        </select>
-      </div>
+      {isLoadingDashboardCardsData ? (
+        <SkeletonLoading count={4} height="h-8" />
+      ) : (
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <SearchInput
+            placeholder="Search users by name or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-w-[220px] max-w-xl flex-1"
+          />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            aria-label="Filter by status"
+          >
+            <option value="all">All status</option>
+            <option value="active">Active</option>
+            <option value="deactivate">Deactivate</option>
+          </select>
+          <select
+            value={filterPhase}
+            onChange={(e) => setFilterPhase(e.target.value as FilterPhase)}
+            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            aria-label="Filter by phase"
+          >
+            <option value="all">All phases</option>
+            <option value="pregnancy">Pregnancy</option>
+            <option value="postpartum">Postpartum</option>
+          </select>
+          <select
+            value={filterDelivery}
+            onChange={(e) => setFilterDelivery(e.target.value as FilterDelivery)}
+            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            aria-label="Filter by delivery"
+          >
+            <option value="all">All delivery</option>
+            <option value="vaginal">Vaginal</option>
+            <option value="cesarean">Cesarean</option>
+            <option value="—">—</option>
+          </select>
+        </div>
+      )}
 
       {isLoadingDashboardCardsData ? (
         <SkeletonLoading count={4} />
@@ -214,11 +218,15 @@ export function UserManagement() {
       )}
 
       <PageTitle as={2}>User Directory</PageTitle>
-      <UserDirectoryTable
-        users={filteredUsers}
-        onRowClick={setSelectedUser}
-        toggleUserStatus={handleToggleStatus}
-      />
+      {isLoadingAllUsers ? (
+        <SkeletonLoading count={10} direction="vertical" height="h-8" />
+      ) : (
+        <UserDirectoryTable
+          users={filteredUsers}
+          onRowClick={setSelectedUser}
+          toggleUserStatus={handleToggleStatus}
+        />
+      )}
 
       {/* User details modal — view details, Edit / Delete / Make Admin / Deactivate */}
       <Modal

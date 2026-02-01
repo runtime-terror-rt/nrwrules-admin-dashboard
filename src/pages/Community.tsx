@@ -3,7 +3,8 @@ import { Button, Card, Icon, Modal, PageHeader, SearchInput } from '../component
 import { theme } from '../constants'
 import { communityFilterTabs, communityPosts, communityStats, type CommunityPost } from '../data'
 import { useGetCommunityStateCardsDataQuery } from '../redux/features/api/admin/communityMonitoring'
-// import { useGetCommunityPostsQuery } from '../redux/features/api/user/community'
+import SkeletonLoading from '@/components/SkeletonLoading'
+import { useGetCommunityPostsQuery } from '../redux/features/api/user/community'
 
 type FilterTabId = 'all' | 'active' | 'inactive' | 'reported'
 
@@ -15,7 +16,8 @@ export function Community() {
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
 
-  const { data: communityStatsData } = useGetCommunityStateCardsDataQuery()
+  const { data: communityStatsData, isLoading: communityStatsLoading } =
+    useGetCommunityStateCardsDataQuery()
   const displayStats = useMemo(() => {
     if (!communityStatsData?.data) return communityStats
     return [
@@ -29,11 +31,10 @@ export function Community() {
     ]
   }, [communityStatsData])
 
-  // ----------------------------have to integrate----------
-
-  // const { data: communityPostsData } = useGetCommunityPostsQuery({})
-
-  // -----------
+  const { data: communityPostsData, isLoading: communityPostsLoading } = useGetCommunityPostsQuery(
+    {}
+  )
+  console.log(communityPostsData)
 
   const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -109,53 +110,67 @@ export function Community() {
         description="Monitor posts, comments, and community activity."
       />
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <SearchInput
-          placeholder="Search by author or content..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[220px] max-w-xl flex-1"
-        />
-        <div className="flex flex-wrap items-center gap-2">
-          <Icon name="filter" size={20} className="text-[var(--color-text-secondary)]" />
-          {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setActiveFilter(t.id)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === t.id
-                  ? 'bg-[var(--color-active-nav)] text-[var(--color-secondary)]'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {t.label}
-            </button>
+      {communityStatsLoading ? (
+        <SkeletonLoading count={4} height="h-8" />
+      ) : (
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <SearchInput
+            placeholder="Search by author or content..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-w-[220px] max-w-xl flex-1"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Icon name="filter" size={20} className="text-[var(--color-text-secondary)]" />
+            {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveFilter(t.id)}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                  activeFilter === t.id
+                    ? 'bg-[var(--color-active-nav)] text-[var(--color-secondary)]'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {communityStatsLoading ? (
+        <SkeletonLoading count={4} height="h-30" />
+      ) : (
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {displayStats.map((s) => (
+            <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
+              <p className="mb-1 text-sm xl:text-base text-gray-600">{s.label}</p>
+              <p className="text-3xl xl:text-5xl font-bold text-[var(--color-primary)]">
+                {s.value}
+              </p>
+            </Card>
           ))}
         </div>
-      </div>
-
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {displayStats.map((s) => (
-          <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
-            <p className="mb-1 text-sm xl:text-base text-gray-600">{s.label}</p>
-            <p className="text-3xl xl:text-5xl font-bold text-[var(--color-primary)]">{s.value}</p>
-          </Card>
-        ))}
-      </div>
+      )}
 
       <div className="space-y-4">
-        {filteredPosts.map((post) => (
-          <CommunityPostCard
-            key={post.id}
-            post={post}
-            onCardClick={() => setSelectedPost(post)}
-            onDelete={(e) => {
-              e.stopPropagation()
-              handleDeletePost(post)
-            }}
-          />
-        ))}
+        {communityPostsLoading ? (
+          <SkeletonLoading count={4} height="h-30" direction="vertical" />
+        ) : (
+          filteredPosts.map((post) => (
+            <CommunityPostCard
+              key={post.id}
+              post={post}
+              onCardClick={() => setSelectedPost(post)}
+              onDelete={(e) => {
+                e.stopPropagation()
+                handleDeletePost(post)
+              }}
+            />
+          ))
+        )}
       </div>
 
       {/* Post details modal — who liked, what are comments, delete comment */}
