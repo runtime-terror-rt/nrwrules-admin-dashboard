@@ -20,8 +20,8 @@ const SkeletonLoading = ({
           key={index}
           className={
             direction === 'horizontal'
-              ? 'h-44 w-full bg-gray-100 rounded-lg'
-              : 'h-44 w-full bg-gray-100 rounded-lg'
+              ? 'h-44 w-full bg-gray-300 rounded-lg'
+              : 'h-44 w-full bg-gray-300 rounded-lg'
           }
         />
       ))}

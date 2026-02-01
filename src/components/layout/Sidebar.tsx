@@ -6,6 +6,7 @@ import { Icon } from '../ui'
 import { useAppDispatch } from '../../redux/store/hooks'
 import { logOut } from '../../redux/features/slice/authSlice'
 import { useLogOutMutation } from '@/redux/features/api/auth/authApi'
+import logo from '../../../public/assets/icon.png'
 
 export interface SidebarProps {
   brand: string
@@ -71,13 +72,12 @@ function SidebarComponent({ brand, navItems, user }: SidebarProps) {
       <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-4">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full p-1.5"
-            style={{ backgroundColor: activeBg }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full "
             aria-hidden
           >
-            <img src={ASSETS.images.logo} alt="" className="h-5 w-5" />
+            <img src={logo} alt="" className="h-9 w-9 object-contain" />
           </span>
-          <span className="truncate font-bold" style={{ color: primary }}>
+          <span className="truncate font-bold text-lg" style={{ color: primary }}>
             {brand}
           </span>
         </div>

@@ -18,6 +18,7 @@ import {
   useGetDashboardUsersQuery,
   useToggleUserStatusMutation,
 } from '../redux/features/api/admin/userManagement'
+import SkeletonLoading from '@/components/SkeletonLoading'
 
 type FilterStatus = 'all' | 'active' | 'deactivate'
 type FilterPhase = 'all' | 'pregnancy' | 'postpartum'
@@ -49,8 +50,9 @@ export function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
 
-  const { data: dashboardCardsData } = useGetDashboardCardsDataQuery({})
-  const { data: allUsers } = useGetDashboardUsersQuery({})
+  const { data: dashboardCardsData, isLoading: isLoadingDashboardCardsData } =
+    useGetDashboardCardsDataQuery({})
+  const { data: allUsers, isLoading: isLoadingAllUsers } = useGetDashboardUsersQuery({})
   const [toggleUserStatus] = useToggleUserStatusMutation()
   const [localUsers, setLocalUsers] = useState<User[]>([])
 
@@ -195,17 +197,21 @@ export function UserManagement() {
         </select>
       </div>
 
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {displayStats.map((s) => (
-          <StatCard
-            key={s.label}
-            label={s.label}
-            value={s.value}
-            change={s.change}
-            positive={s.positive}
-          />
-        ))}
-      </div>
+      {isLoadingDashboardCardsData ? (
+        <SkeletonLoading count={4} />
+      ) : (
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {displayStats.map((s) => (
+            <StatCard
+              key={s.label}
+              label={s.label}
+              value={s.value}
+              change={s.change}
+              positive={s.positive}
+            />
+          ))}
+        </div>
+      )}
 
       <PageTitle as={2}>User Directory</PageTitle>
       <UserDirectoryTable
