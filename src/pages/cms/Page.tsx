@@ -1,118 +1,303 @@
-import { Button, Card, Icon, PageHeader } from '../../components'
-import { theme } from '../../constants'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect } from 'react'
+import { Icon, PageHeader } from '../../components'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
 
-/**
- * CMS Page Settings — Figma node 4076-7800. Pages table + Edit page form.
- */
-export function CmsPage() {
+import { Dialog, DialogContent, DialogTrigger, DialogClose } from '@/components/ui/dialog'
+import SkeletonLoading from '@/components/SkeletonLoading'
+import {
+  useCreateUpdatePageMutation,
+  useDeletePageMutation,
+  useGetPagesQuery,
+} from '@/redux/features/api/admin/pageSetting'
+import TimeConverter from '@/components/TimeConverter'
+import { Plus } from 'lucide-react'
+
+// --- Sub-Component: Page Form Modal ---
+const PageFormModal = ({
+  children,
+  initialData,
+  onSave,
+}: {
+  children: React.ReactNode
+  initialData?: any
+  onSave: (form: any) => void
+}) => {
+  const [open, setOpen] = useState(false)
+  const [form, setForm] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    meta_title: '',
+    meta_description: '',
+    is_active: true,
+    status: 'Published',
+  })
+
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        title: initialData.title || '',
+        slug: initialData.slug || '',
+        content: initialData.content || '',
+        meta_title: initialData.meta_title || '',
+        meta_description: initialData.meta_description || '',
+        is_active: initialData.is_active ?? true,
+        status: initialData.status || 'Published',
+      })
+    }
+  }, [initialData, open])
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: form.content,
+    onUpdate: ({ editor }) => {
+      setForm({ ...form, content: editor.getHTML() })
+    },
+  })
+
+  const handleSubmit = () => {
+    onSave(form)
+    setOpen(false)
+  }
+
   return (
-    <>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="w-[95vw]! max-w-7xl! bg-white p-0 overflow-hidden border-none shadow-2xl">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h2 className="text-xl font-semibold text-sky-500!">
+                {initialData?.id ? 'Edit page' : 'Add New Page'}
+              </h2>
+              <p className="text-sm text-gray-500">Manage static content and SEO.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
+            {/* Left Column: Content */}
+            <div className="lg:col-span-2 space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Page Title
+                </label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full border border-pink-100 rounded-lg p-3 text-sm focus:outline-pink-300 bg-white"
+                  placeholder="Privacy Policy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">URL Slug</label>
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  className="w-full border border-pink-100 rounded-lg p-3 text-sm focus:outline-pink-300 bg-white"
+                  placeholder="privacy"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Content</label>
+                <div className="border border-pink-100 rounded-lg overflow-hidden">
+                  {/* Toolbar */}
+                  <div className="flex gap-3 p-3 border-b border-pink-50 bg-white">
+                    <button
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      className={editor?.isActive('bold') ? 'text-pink-500 font-bold' : ''}
+                    >
+                      B
+                    </button>
+
+                    <button
+                      onClick={() => editor?.chain().focus().toggleItalic().run()}
+                      className={editor?.isActive('italic') ? 'text-pink-500 italic' : ''}
+                    >
+                      I
+                    </button>
+
+                    <button
+                      onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                      className={editor?.isActive('underline') ? 'text-pink-500 underline' : ''}
+                    >
+                      U
+                    </button>
+                  </div>
+
+                  {/* Editor */}
+                  <EditorContent
+                    editor={editor}
+                    className="min-h-[220px] p-4 text-sm focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Settings */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-sm font-bold text-gray-800! mb-4">Publishing Settings</h3>
+                <label className="block text-xs font-bold text-[#E91E63] mb-1.5 uppercase">
+                  Status
+                </label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  className="w-full border border-pink-100 rounded-lg p-3 text-sm appearance-none bg-white mb-4"
+                >
+                  <option>Published</option>
+                  <option>Draft</option>
+                </select>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="active-status"
+                      checked={form.is_active}
+                      onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
+                      className="w-10 h-5 rounded-full appearance-none bg-gray-300 checked:bg-sky-400 relative transition-all cursor-pointer before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all"
+                    />
+                    <label htmlFor="active-status" className="text-sm font-medium text-gray-600">
+                      Active status
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-gray-800! mb-4">SEO Configuration</h3>
+                <label className="block text-xs font-bold text-[#E91E63] mb-1.5 uppercase">
+                  Meta Title
+                </label>
+                <input
+                  type="text"
+                  value={form.meta_title}
+                  onChange={(e) => setForm({ ...form, meta_title: e.target.value })}
+                  className="w-full border border-pink-100 rounded-lg p-3 text-sm mb-4"
+                  placeholder="Privacy Policy - Mamabot"
+                />
+                <label className="block text-xs font-bold text-[#E91E63] mb-1.5 uppercase">
+                  Meta Description
+                </label>
+                <textarea
+                  rows={4}
+                  value={form.meta_description}
+                  onChange={(e) => setForm({ ...form, meta_description: e.target.value })}
+                  className="w-full border border-pink-100 rounded-lg p-3 text-sm"
+                  placeholder="Search engine description..."
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-4 mt-10">
+            <DialogClose className="px-6 py-2 border border-orange-400 text-orange-500 rounded-lg font-medium hover:bg-orange-50 transition-colors">
+              Cancel
+            </DialogClose>
+            <button
+              onClick={handleSubmit}
+              className="px-8 py-2 bg-[#E91E63] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            >
+              {initialData?.id ? 'Update' : 'Create'}
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// --- Main Page Component ---
+export function CmsPage() {
+  const { data: pages, isLoading } = useGetPagesQuery(undefined)
+  const [createUpdate] = useCreateUpdatePageMutation()
+  const [deletePage] = useDeletePageMutation()
+
+  const handleSave = async (formData: any, id?: number) => {
+    try {
+      await createUpdate({ ...formData, id }).unwrap()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  return (
+    <div className="p-4">
       <PageHeader
         title="Pages"
         subtitle="CMS · Page Settings"
         description="Manage static pages and SEO."
         action={
-          <Button variant="primary" size="md" onClick={() => {}} className="shrink-0">
-            <span className="inline-flex items-center gap-2">
-              <Icon name="plus" size={18} />
-              Add New Page
-            </span>
-          </Button>
+          <PageFormModal onSave={(data) => handleSave(data)}>
+            <button className="bg-[#E91E63] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium">
+              <Plus size={18} /> Add Member
+            </button>
+          </PageFormModal>
         }
       />
 
-      {/* Pages table */}
-      <div
-        className="mb-8 overflow-hidden rounded-xl border border-gray-200"
-        style={{ boxShadow: theme.shadow.card }}
-      >
-        <table className="w-full text-left text-sm">
-          <thead>
+      {/* Table Section */}
+      <div className="mt-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+        <table className="w-full text-left">
+          <thead className="bg-[#FFF8F0]">
             <tr>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Title</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Slug</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Status</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Last Updated</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Actions</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Title</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Slug</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Last Updated</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody>
-            <tr className="bg-white">
-              <td className="px-4 py-3 font-medium text-gray-900">Privacy Policy</td>
-              <td className="px-4 py-3 text-gray-600">/privacy</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Published</span>
-              </td>
-              <td className="px-4 py-3 text-gray-600">2 days ago</td>
-              <td className="px-4 py-3 flex gap-2">
-                <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-                <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-              </td>
-            </tr>
-            <tr className="bg-[#FDF1F5]">
-              <td className="px-4 py-3 font-medium text-gray-900">Terms of Service</td>
-              <td className="px-4 py-3 text-gray-600">/terms</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Published</span>
-              </td>
-              <td className="px-4 py-3 text-gray-600">1 month ago</td>
-              <td className="px-4 py-3 flex gap-2">
-                <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-                <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-              </td>
-            </tr>
+          <tbody className="divide-y divide-gray-50">
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="p-10">
+                  <SkeletonLoading count={3} direction="vertical" />
+                </td>
+              </tr>
+            ) : pages?.data.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-10">
+                  <div className="text-center">No data available</div>
+                </td>
+              </tr>
+            ) : (
+              pages?.data?.map((page: any) => (
+                <tr key={page.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-700">{page.title}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">/{page.slug}</td>
+                  <td className="px-6 py-4">
+                    <span className="bg-green-50 text-green-600 px-3 py-1 rounded-md text-xs font-bold border border-green-100">
+                      Published
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-400">
+                    <TimeConverter timestamp={page.updated_at} />
+                  </td>
+                  <td className="px-6 py-4 flex justify-center gap-3">
+                    <PageFormModal initialData={page} onSave={(data) => handleSave(data, page.id)}>
+                      <button className="text-[#E91E63] p-1 hover:bg-pink-50 rounded transition-colors">
+                        <Icon name="edit" size={20} />
+                      </button>
+                    </PageFormModal>
+                    <button
+                      onClick={() => deletePage(page.id)}
+                      className="text-[#E91E63] p-1 hover:bg-pink-50 rounded transition-colors"
+                    >
+                      <Icon name="trash" size={20} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-
-      {/* Edit page form */}
-      <Card>
-        <h2 className="mb-1 text-lg font-semibold text-[var(--color-secondary)]">Edit page</h2>
-        <p className="mb-4 text-sm text-gray-600">Manage static content and SEO.</p>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Page Title</label>
-            <input type="text" defaultValue="Privacy Policy" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">URL Slug</label>
-            <input type="text" defaultValue="privacy" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">Content</label>
-            <textarea rows={6} placeholder="Enter markdown or HTML content..." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 bg-gray-50 p-2">
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Bold">B</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Italic">I</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Underline">U</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Strikethrough">S</button>
-              <span className="mx-1 border-l border-gray-200" aria-hidden />
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="List">•</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Code">&lt;/&gt;</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Image">🖼</button>
-              <button type="button" className="rounded p-1.5 text-gray-500 hover:bg-gray-200" aria-label="Link">🔗</button>
-            </div>
-          </div>
-          <div className="space-y-6">
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-800">Publishing Settings</h3>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Status</label>
-              <input type="text" defaultValue="Published" className="mb-4 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-              <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                <span className="text-sm font-medium text-gray-700">Active status</span>
-                <span className="h-6 w-11 rounded-full bg-blue-500" aria-hidden />
-              </div>
-            </div>
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-800">SEO Configuration</h3>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Meta Title</label>
-              <input type="text" defaultValue="Privacy Policy - Mamabot" className="mb-4 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Meta Description</label>
-              <input type="text" placeholder="Search engine description..." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button type="button" className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800">Cancel</button>
-          <button type="button" className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: theme.color.primary }}>Update</button>
-        </div>
-      </Card>
-    </>
+    </div>
   )
 }

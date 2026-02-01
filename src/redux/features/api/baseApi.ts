@@ -57,6 +57,7 @@ export const baseApi = createApi({
     'AboutUs',
     'Journey',
     'Mission',
+    'PageSetting',
     'AIRules',
     'Products',
     'Profile',
