@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { theme } from '../constants'
 import type { User } from '../types'
 import { Button, Icon } from './ui'
+import CommonDeleteModal from './modal/CommonDeleteModal'
 
 export interface UserDirectoryTableProps {
   users: User[]
@@ -135,12 +136,17 @@ const TableRow = memo(function TableRow({
         className="px-4 py-3"
         onClick={(e) => {
           e.stopPropagation()
-          toggleUserStatus?.(user)
         }}
       >
-        <Button variant={user.status === 'active' ? 'danger' : 'success'} size="sm" type="button">
-          {user.status === 'active' ? 'Deactivate' : 'Active'}
-        </Button>
+        <CommonDeleteModal
+          onConfirm={() => toggleUserStatus?.(user)}
+          title="Are you sure you want to deactivate this user?"
+          btnText={user.status === 'active' ? 'Deactivate' : 'Active'}
+        >
+          <Button variant={user.status === 'active' ? 'danger' : 'success'} size="sm" type="button">
+            {user.status === 'active' ? 'Deactivate' : 'Active'}
+          </Button>
+        </CommonDeleteModal>
       </td>
     </tr>
   )

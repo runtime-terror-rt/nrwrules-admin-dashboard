@@ -8,10 +8,11 @@ import {
   useApproveOrRemoveReportedPostMutation,
   useGetReportedPostsQuery,
 } from '../redux/features/api/admin/communityMonitoring'
+import SkeletonLoading from '@/components/SkeletonLoading'
 
 /** Reported Content — Figma node 3498-12355. Summary cards, Pending Review, Recently Reviewed. */
 export function ReportedContent() {
-  const { data: reportedPostsData } = useGetReportedPostsQuery({})
+  const { data: reportedPostsData, isLoading: reportedPostsLoading } = useGetReportedPostsQuery({})
   const displayStats = useMemo(() => {
     if (!reportedPostsData?.data) return reportedStats
     return [
@@ -43,33 +44,37 @@ export function ReportedContent() {
         description="Review and moderate reported posts."
       />
 
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {displayStats.map((s) => (
-          <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
-            <p className="mb-1 text-sm xl:text-base text-[var(--color-text-secondary)]">
-              {s.label}
-            </p>
-            <p
-              className={`text-4xl xl:text-5xl font-bold ${
-                s.color === 'pink'
-                  ? 'text-[var(--color-primary)]'
-                  : s.color === 'green'
-                    ? 'text-[var(--color-success)]'
-                    : 'text-[var(--color-warning)]'
-              }`}
-            >
-              {s.value}
-            </p>
-          </Card>
-        ))}
-      </div>
+      {reportedPostsLoading ? (
+        <SkeletonLoading count={3} height="h-30" />
+      ) : (
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {displayStats.map((s) => (
+            <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
+              <p className="mb-1 text-sm xl:text-base text-[var(--color-text-secondary)]">
+                {s.label}
+              </p>
+              <p
+                className={`text-4xl xl:text-5xl font-bold ${
+                  s.color === 'pink'
+                    ? 'text-[var(--color-primary)]'
+                    : s.color === 'green'
+                      ? 'text-[var(--color-success)]'
+                      : 'text-[var(--color-warning)]'
+                }`}
+              >
+                {s.value}
+              </p>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <PageTitle as={2}>Pending Review</PageTitle>
       <div className="mb-8 space-y-4">
         {pendingReports.length > 0 ? (
           pendingReports.map((item: any) => <PendingReportCard key={item.id} item={item} />)
         ) : (
-          <div className="text-center text-gray-500 py-10 border rounded-lg border-gray-300!">
+          <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
             No pending reports
           </div>
         )}
@@ -82,7 +87,7 @@ export function ReportedContent() {
             <ReviewedCard key={`${item.reporter}-${item.posted}`} item={item} />
           ))
         ) : (
-          <div className="text-center text-gray-500 py-10 border rounded-lg border-gray-300!">
+          <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
             No recently reviewed posts
           </div>
         )}

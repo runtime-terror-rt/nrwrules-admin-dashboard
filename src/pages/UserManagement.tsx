@@ -214,11 +214,15 @@ export function UserManagement() {
       )}
 
       <PageTitle as={2}>User Directory</PageTitle>
-      <UserDirectoryTable
-        users={filteredUsers}
-        onRowClick={setSelectedUser}
-        toggleUserStatus={handleToggleStatus}
-      />
+      {isLoadingAllUsers ? (
+        <SkeletonLoading count={10} direction="vertical" height="h-8" />
+      ) : (
+        <UserDirectoryTable
+          users={filteredUsers}
+          onRowClick={setSelectedUser}
+          toggleUserStatus={handleToggleStatus}
+        />
+      )}
 
       {/* User details modal — view details, Edit / Delete / Make Admin / Deactivate */}
       <Modal
