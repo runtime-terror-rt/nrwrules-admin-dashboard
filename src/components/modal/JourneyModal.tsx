@@ -92,37 +92,47 @@ const JourneyModal = ({
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           <div className="space-y-4">
+            <label htmlFor="title">Journey Title</label>
             <input
+              id="title"
               placeholder="Journey Title"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg mt-1"
             />
+            <label htmlFor="description">Description</label>
             <textarea
+              id="description"
               placeholder="Description"
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg mt-1"
             />
+            <label htmlFor="count">Milestone Count</label>
             <input
+              id="count"
               placeholder="Count (e.g. 300)"
               type="number"
               value={form.count}
               onChange={(e) => setForm({ ...form, count: e.target.value })}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg mt-1"
             />
+            <label htmlFor="subtitle_1">Subtitle One</label>
             <input
+              id="subtitle_1"
               placeholder="Subtitle One"
               value={form.subtitle_1}
               onChange={(e) => setForm({ ...form, subtitle_1: e.target.value })}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg mt-1"
             />
+            <label htmlFor="subtitle_2">Subtitle Two</label>
             <input
+              id="subtitle_2"
               placeholder="Subtitle Two"
               value={form.subtitle_2}
               onChange={(e) => setForm({ ...form, subtitle_2: e.target.value })}
-              className="w-full border p-2 rounded-lg"
+              className="w-full border p-2 rounded-lg mt-1"
             />
           </div>
           <div className="space-y-4">

@@ -10,7 +10,7 @@ import JourneyModal from '@/components/modal/JourneyModal'
 
 export function CmsOurJourney() {
   const { data: journeys, isLoading } = useGetJourneysQuery(undefined)
-  const [deleteJourney] = useDeleteJourneyMutation()
+  const [deleteJourney, { isLoading: isDeleting }] = useDeleteJourneyMutation()
 
   return (
     <>
@@ -29,7 +29,7 @@ export function CmsOurJourney() {
 
       <div className="grid grid-cols-1  gap-6">
         {isLoading ? (
-          <SkeletonLoading count={3} />
+          <SkeletonLoading count={3} direction="vertical" />
         ) : (
           journeys?.data?.map((m: any, i: number) => (
             <Card key={m.id || i} className="flex items-start justify-between gap-4 p-4 ">
@@ -49,11 +49,13 @@ export function CmsOurJourney() {
                   />
                 </div>
                 <div>
-                  <p className="font-semibold text-[var(--color-primary)]">{m.title}</p>
-                  <p className="text-sm text-gray-600 line-clamp-2 italic">
+                  <p className="text-xs text-sky-400 mt-1">
+                    {m.count > 1000 ? `${Math.round(m.count / 1000)}k+` : m.count}
+                  </p>
+                  <p className="font-semibold text-lg text-rose-500">{m.title}</p>
+                  <p className="text-sm text-gray-600 line-clamp-2 italic mt-2">
                     &ldquo;{m.description}&rdquo;
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">Order: {m.sort_order}</p>
                 </div>
               </div>
 
@@ -61,16 +63,16 @@ export function CmsOurJourney() {
                 <JourneyModal initialData={m}>
                   <button
                     type="button"
-                    className="p-1.5 text-gray-400 hover:text-[var(--color-primary)] transition-colors"
+                    className="p-1.5 text-gray-400! hover:text-sky-500! transition-colors"
                     aria-label="Edit"
                   >
-                    <Icon name="edit" size={18} className="text-sky-500! cursor-pointer" />
+                    <Icon name="edit" size={18} className="cursor-pointer" />
                   </button>
                 </JourneyModal>
-                <DeleteJourneyModal onConfirm={() => deleteJourney(m.id)}>
+                <DeleteJourneyModal onConfirm={() => deleteJourney(m.id)} isLoading={isDeleting}>
                   <button
                     type="button"
-                    className="p-1.5 text-gray-400 hover:text-red-500! transition-colors"
+                    className="p-1.5 text-gray-400! hover:text-red-500! transition-colors"
                     aria-label="Delete"
                   >
                     <Icon name="trash" size={18} className="text-red-500! cursor-pointer" />

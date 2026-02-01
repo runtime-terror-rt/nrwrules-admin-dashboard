@@ -10,22 +10,28 @@ import {
 const DeleteJourneyModal = ({
   onConfirm,
   children,
+  isLoading,
 }: {
   onConfirm: () => void
   children: React.ReactNode
+  isLoading: boolean
 }) => (
   <Dialog>
     <DialogTrigger asChild>{children}</DialogTrigger>
     <DialogContent className="max-w-md">
       <DialogHeader>
-        <DialogTitle className="text-red-500">Confirm Deletion</DialogTitle>
+        <DialogTitle className="text-red-500!">Confirm Deletion</DialogTitle>
       </DialogHeader>
       <p className="text-gray-600">
         Are you sure you want to remove this journey milestone? This action cannot be undone.
       </p>
       <div className="flex gap-3 mt-4">
-        <button onClick={onConfirm} className="px-4 py-2 bg-red-500 text-white rounded-lg">
-          Delete
+        <button
+          onClick={onConfirm}
+          disabled={isLoading}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg"
+        >
+          {isLoading ? 'Deleting...' : 'Delete'}
         </button>
         <DialogClose className="px-4 py-2 border rounded-lg">Cancel</DialogClose>
       </div>
