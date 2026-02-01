@@ -2,9 +2,11 @@ import { Skeleton } from './ui/skeleton'
 
 const SkeletonLoading = ({
   count = 1,
+  height = 'h-40',
   direction = 'horizontal',
 }: {
   count?: number
+  height?: string
   direction?: 'horizontal' | 'vertical'
 }) => {
   return (
@@ -20,8 +22,8 @@ const SkeletonLoading = ({
           key={index}
           className={
             direction === 'horizontal'
-              ? 'h-44 w-full bg-gray-300 rounded-lg'
-              : 'h-44 w-full bg-gray-300 rounded-lg'
+              ? `${height} w-full bg-gray-300 rounded-lg`
+              : `${height} w-full bg-gray-300 rounded-lg`
           }
         />
       ))}

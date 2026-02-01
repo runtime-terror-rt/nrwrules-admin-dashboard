@@ -15,20 +15,25 @@ export function AIRules() {
 
       <div className="space-y-6">
         <Card>
-          <SectionHeader icon={<Icon name="chat" size={20} primary />} title="Chatbot Replies & User Limits" />
+          <SectionHeader
+            icon={<Icon name="chat" size={20} primary />}
+            title="Chatbot Replies & User Limits"
+          />
           <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-gray-700">
-            <li>Free Users: Maximum 10 chatbot replies per day</li>
-            <li>Pro Users: Unlimited replies</li>
+            <li>Users: Maximum 10 chatbot replies per day</li>
           </ul>
         </Card>
 
         <Card>
-          <SectionHeader icon={<Icon name="shield" size={20} primary />} title="Content Safety / Rules" />
+          <SectionHeader
+            icon={<Icon name="shield" size={20} primary />}
+            title="Content Safety / Rules"
+          />
           <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-gray-700">
             <li>
-              <strong>Medical Safety First - NEVER give a diagnosis or treatment:</strong>{' '}
-              Always escalate emergencies (breathing problems, unconsciousness, high fever &lt;3
-              months, seizures, heavy bleeding, severe sudden pain) → say:{' '}
+              <strong>Medical Safety First - NEVER give a diagnosis or treatment:</strong> Always
+              escalate emergencies (breathing problems, unconsciousness, high fever &lt;3 months,
+              seizures, heavy bleeding, severe sudden pain) → say:{' '}
               <span className="font-semibold text-red-600">CALL EMERGENCY 112!</span>
             </li>
             <li>
@@ -37,9 +42,9 @@ export function AIRules() {
               individual assessment.
             </li>
             <li>
-              <strong>Honesty About Knowledge Limits:</strong> Rare diseases → refer to
-              specialists; Individual diagnoses → only doctor can say; Legal/financial details →
-              advise consulting official sources; Post-October 2023 events → &quot;I have no current
+              <strong>Honesty About Knowledge Limits:</strong> Rare diseases → refer to specialists;
+              Individual diagnoses → only doctor can say; Legal/financial details → advise
+              consulting official sources; Post-October 2023 events → &quot;I have no current
               info&quot;
             </li>
             <li>
@@ -66,9 +71,10 @@ export function AIRules() {
             </p>
             <p>
               <strong>Medical Safety:</strong> Emergency symptoms → ALWAYS say &quot;CALL 112!&quot;
-              (breathing issues, unconsciousness, high fever &lt;3m, seizures, severe bleeding/pain).
-              No diagnoses or treatment recommendations. Use standard phrase: &quot;Based on general
-              knowledge... BUT contact your paediatrician/gynaecologist.&quot;
+              (breathing issues, unconsciousness, high fever &lt;3m, seizures, severe
+              bleeding/pain). No diagnoses or treatment recommendations. Use standard phrase:
+              &quot;Based on general knowledge... BUT contact your
+              paediatrician/gynaecologist.&quot;
             </p>
             <p>
               <strong>Communication:</strong> Warm, empathetic, encouraging, honest about limits.
@@ -80,13 +86,13 @@ export function AIRules() {
             </p>
             <p>
               <strong>DACH Knowledge:</strong> Germany: U-exams, STIKO vaccines, parental allowance,
-              Kindergeld, parental leave, midwife coverage. Austria: Mother-Child Passport, childcare
-              allowance, maternity pay, parental leave. Switzerland: Maternity compensation,
-              paediatric checks, insurance registration, premium reduction.
+              Kindergeld, parental leave, midwife coverage. Austria: Mother-Child Passport,
+              childcare allowance, maternity pay, parental leave. Switzerland: Maternity
+              compensation, paediatric checks, insurance registration, premium reduction.
             </p>
             <p>
-              <strong>Age/Stage Adjustment:</strong> Pregnancy: trimester-specific focus. Baby: 0-3m,
-              4-6m, 7-12m, 12-24m developmental tips.
+              <strong>Age/Stage Adjustment:</strong> Pregnancy: trimester-specific focus. Baby:
+              0-3m, 4-6m, 7-12m, 12-24m developmental tips.
             </p>
             <p>
               <strong>Products:</strong> Suggest when user asks/buys intent. Focus on features, not
@@ -113,17 +119,11 @@ export function AIRules() {
   )
 }
 
-function SectionHeader({
-  icon,
-  title,
-}: {
-  icon: React.ReactNode
-  title: string
-}) {
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-2">
       <span>{icon}</span>
-      <h2 className="text-base font-semibold text-[var(--color-secondary)]">{title}</h2>
+      <h2 className="text-base font-semibold text-rose-400!">{title}</h2>
     </div>
   )
 }
