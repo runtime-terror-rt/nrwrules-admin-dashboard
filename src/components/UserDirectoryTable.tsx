@@ -30,7 +30,7 @@ function UserDirectoryTableComponent({
       className="overflow-hidden rounded-xl border border-gray-200 bg-white"
       style={{ boxShadow: theme.shadow.card }}
     >
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-left text-[10px] md:text-sm overflow-x-scroll">
         <thead>
           <tr>
             <th

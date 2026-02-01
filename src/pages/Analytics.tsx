@@ -120,7 +120,7 @@ export function Analytics() {
       />
 
       {isLoading ? (
-        <SkeletonLoading count={4} direction="horizontal" />
+        <SkeletonLoading count={3} direction="horizontal" />
       ) : (
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {analyticsStats.map((s) => (
@@ -139,7 +139,7 @@ export function Analytics() {
 
       <div className="mb-8 grid gap-6 grid-cols-1">
         {isLoading ? (
-          <SkeletonLoading count={1} direction="vertical" />
+          <SkeletonLoading count={1} direction="vertical" height="h-88" />
         ) : (
           <Card className="p-4">
             <h3 className="mb-4 text-base font-semibold text-sky-400!">
@@ -151,7 +151,7 @@ export function Analytics() {
         )}
 
         {isLoading ? (
-          <SkeletonLoading count={1} direction="vertical" />
+          <SkeletonLoading count={1} direction="vertical" height="h-88" />
         ) : (
           <Card className="p-4">
             <h3 className="mb-4 text-base font-semibold text-sky-400!">

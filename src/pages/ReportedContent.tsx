@@ -45,53 +45,60 @@ export function ReportedContent() {
       />
 
       {reportedPostsLoading ? (
-        <SkeletonLoading count={3} height="h-30" />
-      ) : (
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {displayStats.map((s) => (
-            <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
-              <p className="mb-1 text-sm xl:text-base text-[var(--color-text-secondary)]">
-                {s.label}
-              </p>
-              <p
-                className={`text-4xl xl:text-5xl font-bold ${
-                  s.color === 'pink'
-                    ? 'text-[var(--color-primary)]'
-                    : s.color === 'green'
-                      ? 'text-[var(--color-success)]'
-                      : 'text-[var(--color-warning)]'
-                }`}
-              >
-                {s.value}
-              </p>
-            </Card>
-          ))}
+        <div className="space-y-8">
+          <SkeletonLoading count={3} height="h-30" />
+          <SkeletonLoading count={1} height="h-60" direction="vertical" />
+          <SkeletonLoading count={1} height="h-60" direction="vertical" />
+          <SkeletonLoading count={3} height="h-40" />
         </div>
+      ) : (
+        <>
+          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {displayStats.map((s) => (
+              <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
+                <p className="mb-1 text-sm xl:text-base text-[var(--color-text-secondary)]">
+                  {s.label}
+                </p>
+                <p
+                  className={`text-4xl xl:text-5xl font-bold ${
+                    s.color === 'pink'
+                      ? 'text-[var(--color-primary)]'
+                      : s.color === 'green'
+                        ? 'text-[var(--color-success)]'
+                        : 'text-[var(--color-warning)]'
+                  }`}
+                >
+                  {s.value}
+                </p>
+              </Card>
+            ))}
+          </div>
+
+          <PageTitle as={2}>Pending Review</PageTitle>
+          <div className="mb-8 space-y-4">
+            {pendingReports.length > 0 ? (
+              pendingReports.map((item: any) => <PendingReportCard key={item.id} item={item} />)
+            ) : (
+              <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
+                No pending reports
+              </div>
+            )}
+          </div>
+
+          <PageTitle as={2}>Recently Reviewed</PageTitle>
+          <div className="space-y-4">
+            {recentlyReviewed.length > 0 ? (
+              recentlyReviewed.map((item: any) => (
+                <ReviewedCard key={`${item.reporter}-${item.posted}`} item={item} />
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
+                No recently reviewed posts
+              </div>
+            )}
+          </div>
+        </>
       )}
-
-      <PageTitle as={2}>Pending Review</PageTitle>
-      <div className="mb-8 space-y-4">
-        {pendingReports.length > 0 ? (
-          pendingReports.map((item: any) => <PendingReportCard key={item.id} item={item} />)
-        ) : (
-          <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
-            No pending reports
-          </div>
-        )}
-      </div>
-
-      <PageTitle as={2}>Recently Reviewed</PageTitle>
-      <div className="space-y-4">
-        {recentlyReviewed.length > 0 ? (
-          recentlyReviewed.map((item: any) => (
-            <ReviewedCard key={`${item.reporter}-${item.posted}`} item={item} />
-          ))
-        ) : (
-          <div className="text-center text-gray-500 py-20 border rounded-lg border-gray-100!">
-            No recently reviewed posts
-          </div>
-        )}
-      </div>
     </>
   )
 }

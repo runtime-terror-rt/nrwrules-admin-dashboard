@@ -34,6 +34,7 @@ export function Community() {
   const { data: communityPostsData, isLoading: communityPostsLoading } = useGetCommunityPostsQuery(
     {}
   )
+  console.log(communityPostsData)
 
   const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -109,31 +110,35 @@ export function Community() {
         description="Monitor posts, comments, and community activity."
       />
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <SearchInput
-          placeholder="Search by author or content..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[220px] max-w-xl flex-1"
-        />
-        <div className="flex flex-wrap items-center gap-2">
-          <Icon name="filter" size={20} className="text-[var(--color-text-secondary)]" />
-          {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setActiveFilter(t.id)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === t.id
-                  ? 'bg-[var(--color-active-nav)] text-[var(--color-secondary)]'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+      {communityStatsLoading ? (
+        <SkeletonLoading count={4} height="h-8" />
+      ) : (
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <SearchInput
+            placeholder="Search by author or content..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-w-[220px] max-w-xl flex-1"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Icon name="filter" size={20} className="text-[var(--color-text-secondary)]" />
+            {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveFilter(t.id)}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                  activeFilter === t.id
+                    ? 'bg-[var(--color-active-nav)] text-[var(--color-secondary)]'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {communityStatsLoading ? (
         <SkeletonLoading count={4} height="h-30" />

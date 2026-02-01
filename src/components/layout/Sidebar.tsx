@@ -12,10 +12,10 @@ export interface SidebarProps {
   brand: string
   navItems: NavItem[]
   user: CurrentUser
-  isCollapsed: boolean
-  setIsCollapsed: (v: boolean) => void
-  isMobileOpen: boolean
-  setIsMobileOpen: (v: boolean) => void
+  isCollapsed?: boolean
+  setIsCollapsed?: (v: boolean) => void
+  isMobileOpen?: boolean
+  setIsMobileOpen?: (v: boolean) => void
 }
 
 const primary = theme.color.primary
@@ -30,10 +30,10 @@ function SidebarComponent({
   brand,
   navItems,
   user,
-  isCollapsed,
-  setIsCollapsed,
-  isMobileOpen,
-  setIsMobileOpen,
+  isCollapsed = false,
+  setIsCollapsed = () => {},
+  isMobileOpen = false,
+  setIsMobileOpen = () => {},
 }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
