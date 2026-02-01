@@ -1,9 +1,9 @@
 /** Community Monitoring stats from Figma */
 export const communityStats = [
-  { label: 'Total Posts', value: 6 },
-  { label: 'Total Comments', value: 68 },
-  { label: 'Total Likes', value: 133 },
-  { label: 'Reported Posts', value: 1 },
+  { label: 'Total Posts', value: 0 },
+  { label: 'Total Comments', value: 0 },
+  { label: 'Total Likes', value: 0 },
+  { label: 'Reported Posts', value: 0 },
 ]
 
 /** State-based filter tabs: clicking sets filter state. Active = not reported, Inactive = reported. */
@@ -46,8 +46,18 @@ export const communityPosts: CommunityPost[] = [
     likes: 24,
     likedBy: ['Maria G.', 'Emily C.', 'Jessica W.', 'Amanda B.', 'Lisa K.'],
     commentEntries: [
-      { id: 'c1-1', author: 'Maria G.', content: 'Try a pregnancy pillow! It helped me so much.', timestamp: '2026-01-14 11:00 AM' },
-      { id: 'c1-2', author: 'Emily C.', content: 'Heat pad on low setting works wonders.', timestamp: '2026-01-14 11:15 AM' },
+      {
+        id: 'c1-1',
+        author: 'Maria G.',
+        content: 'Try a pregnancy pillow! It helped me so much.',
+        timestamp: '2026-01-14 11:00 AM',
+      },
+      {
+        id: 'c1-2',
+        author: 'Emily C.',
+        content: 'Heat pad on low setting works wonders.',
+        timestamp: '2026-01-14 11:15 AM',
+      },
     ],
   },
   {
@@ -55,13 +65,23 @@ export const communityPosts: CommunityPost[] = [
     author: 'Mario Garcia',
     timestamp: '2026-01-14 09:15 AM',
     content:
-      'Recovery after cesarean is no joke! Taking it slow and following all doctor\'s orders. Thank you to this community for all the support.',
+      "Recovery after cesarean is no joke! Taking it slow and following all doctor's orders. Thank you to this community for all the support.",
     comments: 2,
     likes: 18,
     likedBy: ['Sarah J.', 'Jessica W.', 'Amanda B.'],
     commentEntries: [
-      { id: 'c2-1', author: 'Sarah J.', content: 'You got this! Rest when you can.', timestamp: '2026-01-14 09:45 AM' },
-      { id: 'c2-2', author: 'Jessica W.', content: 'Sending healing vibes your way.', timestamp: '2026-01-14 10:00 AM' },
+      {
+        id: 'c2-1',
+        author: 'Sarah J.',
+        content: 'You got this! Rest when you can.',
+        timestamp: '2026-01-14 09:45 AM',
+      },
+      {
+        id: 'c2-2',
+        author: 'Jessica W.',
+        content: 'Sending healing vibes your way.',
+        timestamp: '2026-01-14 10:00 AM',
+      },
     ],
   },
   {
@@ -74,8 +94,18 @@ export const communityPosts: CommunityPost[] = [
     likes: 22,
     likedBy: ['Maria G.', 'Sarah J.', 'Amanda B.'],
     commentEntries: [
-      { id: 'c3-1', author: 'Maria G.', content: 'I had it until week 28. Ginger tea helped a bit.', timestamp: '2026-01-14 08:30 AM' },
-      { id: 'c3-2', author: 'Sarah J.', content: 'Talk to your OB about meds — they can help.', timestamp: '2026-01-14 08:45 AM' },
+      {
+        id: 'c3-1',
+        author: 'Maria G.',
+        content: 'I had it until week 28. Ginger tea helped a bit.',
+        timestamp: '2026-01-14 08:30 AM',
+      },
+      {
+        id: 'c3-2',
+        author: 'Sarah J.',
+        content: 'Talk to your OB about meds — they can help.',
+        timestamp: '2026-01-14 08:45 AM',
+      },
     ],
   },
   {
@@ -88,8 +118,18 @@ export const communityPosts: CommunityPost[] = [
     likes: 35,
     likedBy: ['Sarah J.', 'Emily C.', 'Maria G.', 'Amanda B.'],
     commentEntries: [
-      { id: 'c4-1', author: 'Sarah J.', content: 'Needed to hear this today. Thank you!', timestamp: '2026-01-13 07:00 PM' },
-      { id: 'c4-2', author: 'Emily C.', content: 'So true — week 6 was my turning point.', timestamp: '2026-01-13 07:20 PM' },
+      {
+        id: 'c4-1',
+        author: 'Sarah J.',
+        content: 'Needed to hear this today. Thank you!',
+        timestamp: '2026-01-13 07:00 PM',
+      },
+      {
+        id: 'c4-2',
+        author: 'Emily C.',
+        content: 'So true — week 6 was my turning point.',
+        timestamp: '2026-01-13 07:20 PM',
+      },
     ],
   },
   {
@@ -102,8 +142,18 @@ export const communityPosts: CommunityPost[] = [
     likes: 14,
     likedBy: ['Jessica W.', 'Emily C.'],
     commentEntries: [
-      { id: 'c5-1', author: 'Jessica W.', content: 'YouTube "prenatal yoga third trimester" — lots of free options!', timestamp: '2026-01-13 04:45 PM' },
-      { id: 'c5-2', author: 'Emily C.', content: 'I did Bloom Yoga online. Very gentle.', timestamp: '2026-01-13 05:00 PM' },
+      {
+        id: 'c5-1',
+        author: 'Jessica W.',
+        content: 'YouTube "prenatal yoga third trimester" — lots of free options!',
+        timestamp: '2026-01-13 04:45 PM',
+      },
+      {
+        id: 'c5-2',
+        author: 'Emily C.',
+        content: 'I did Bloom Yoga online. Very gentle.',
+        timestamp: '2026-01-13 05:00 PM',
+      },
     ],
   },
   {

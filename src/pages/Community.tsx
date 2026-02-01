@@ -1,19 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  Button,
-  Card,
-  Icon,
-  Modal,
-  PageHeader,
-  SearchInput,
-} from '../components'
+import { Button, Card, Icon, Modal, PageHeader, SearchInput } from '../components'
 import { theme } from '../constants'
-import {
-  communityFilterTabs,
-  communityPosts,
-  communityStats,
-  type CommunityPost,
-} from '../data'
+import { communityFilterTabs, communityPosts, communityStats, type CommunityPost } from '../data'
+import { useGetCommunityStateCardsDataQuery } from '../redux/features/api/admin/communityMonitoring'
+// import { useGetCommunityPostsQuery } from '../redux/features/api/user/community'
 
 type FilterTabId = 'all' | 'active' | 'inactive' | 'reported'
 
@@ -24,6 +14,26 @@ export function Community() {
   const [posts, setPosts] = useState<CommunityPost[]>(communityPosts)
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
+
+  const { data: communityStatsData } = useGetCommunityStateCardsDataQuery()
+  const displayStats = useMemo(() => {
+    if (!communityStatsData?.data) return communityStats
+    return [
+      { ...communityStats[0], value: communityStatsData.data.total_posts ?? 0 },
+      { ...communityStats[1], value: communityStatsData.data.total_comments ?? 0 },
+      { ...communityStats[2], value: communityStatsData.data.total_likes ?? 0 },
+      {
+        ...communityStats[3],
+        value: `${communityStatsData.data.reported_posts ?? 0}`,
+      },
+    ]
+  }, [communityStatsData])
+
+  // ----------------------------have to integrate----------
+
+  // const { data: communityPostsData } = useGetCommunityPostsQuery({})
+
+  // -----------
 
   const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -49,9 +59,7 @@ export function Community() {
   }
 
   const handleToggleReported = (post: CommunityPost) => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === post.id ? { ...p, reported: !p.reported } : p))
-    )
+    setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, reported: !p.reported } : p)))
     setSelectedPost((p) => (p && p.id === post.id ? { ...p, reported: !p.reported } : p))
   }
 
@@ -99,20 +107,6 @@ export function Community() {
         title="Community Monitoring"
         subtitle="Community Monitoring"
         description="Monitor posts, comments, and community activity."
-        action={
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            onClick={() => setShowAddModal(true)}
-            className="shrink-0"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Icon name="plus" size={18} />
-              Add post
-            </span>
-          </Button>
-        }
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -142,10 +136,10 @@ export function Community() {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {communityStats.map((s) => (
-          <Card key={s.label}>
-            <p className="mb-1 text-sm text-gray-600">{s.label}</p>
-            <p className="text-2xl font-bold text-[var(--color-primary)]">{s.value}</p>
+        {displayStats.map((s) => (
+          <Card key={s.label} className="h-30 flex flex-col justify-center gap-2">
+            <p className="mb-1 text-sm xl:text-base text-gray-600">{s.label}</p>
+            <p className="text-3xl xl:text-5xl font-bold text-[var(--color-primary)]">{s.value}</p>
           </Card>
         ))}
       </div>
@@ -190,9 +184,7 @@ export function Community() {
                 Likes ({selectedPost.likes})
               </h3>
               <p className="text-sm text-[var(--color-text-primary)]">
-                {selectedPost.likedBy?.length
-                  ? selectedPost.likedBy.join(', ')
-                  : 'No likes yet'}
+                {selectedPost.likedBy?.length ? selectedPost.likedBy.join(', ') : 'No likes yet'}
               </p>
             </section>
 
@@ -259,7 +251,10 @@ export function Community() {
       <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Add post">
         <form onSubmit={handleAddPost} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Author
             </label>
             <input
@@ -270,7 +265,10 @@ export function Community() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: theme.color.textPrimary }}>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: theme.color.textPrimary }}
+            >
               Content
             </label>
             <textarea
@@ -309,8 +307,8 @@ function CommunityPostCard({ post, onCardClick, onDelete }: CommunityPostCardPro
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-gray-900">{post.author}</p>
-          <p className="flex items-center gap-1.5 text-xs text-gray-500">
+          <p className="text-sm xl:text-base font-semibold text-gray-900">{post.author}</p>
+          <p className="flex items-center gap-1.5 text-xs xl:text-sm text-gray-500">
             <Icon name="clock" size={14} className="shrink-0" />
             {post.timestamp}
           </p>
@@ -331,11 +329,11 @@ function CommunityPostCard({ post, onCardClick, onDelete }: CommunityPostCardPro
           </button>
         </div>
       </div>
-      <p className="text-sm text-gray-700 line-clamp-2">{post.content}</p>
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <p className="mt-2 text-sm xl:text-base text-gray-700 line-clamp-2">{post.content}</p>
+      <div className="flex items-center gap-4 text-xs xl:text-sm text-sky-400">
         <span className="flex items-center gap-1">
           <Icon name="message" size={14} className="shrink-0" />
-          {(post.commentEntries?.length ?? post.comments)} Comments
+          {post.commentEntries?.length ?? post.comments} Comments
         </span>
         <span className="flex items-center gap-1">
           <Icon name="heart" size={14} className="shrink-0" />
@@ -345,4 +343,3 @@ function CommunityPostCard({ post, onCardClick, onDelete }: CommunityPostCardPro
     </Card>
   )
 }
-

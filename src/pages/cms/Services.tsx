@@ -1,10 +1,51 @@
-import { Button, Card, Icon, PageHeader } from '../../components'
-import { theme } from '../../constants'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react'
+import { Button, Icon, PageHeader } from '../../components'
+import {
+  useGetServiceDataQuery,
+  useCreateOrUpdateServiceMutation,
+  useDeleteServiceMutation,
+  useToggleServiceStatusMutation,
+} from '../../redux/features/api/admin/crm'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import EditServiceForm from './services/EditServiceForm'
+import { Trash2 } from 'lucide-react'
 
-/**
- * CMS Services — Figma node 3924-18987. Our Services: table + Edit Service form.
- */
-export function CmsServices() {
+export function Services() {
+  const { data } = useGetServiceDataQuery()
+  const [saveService, { isLoading: isSaving }] = useCreateOrUpdateServiceMutation()
+  const [deleteService] = useDeleteServiceMutation()
+  const [toggleServiceStatus] = useToggleServiceStatusMutation()
+
+  const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<any>(null)
+  const [form, setForm] = useState<any>({})
+  const [files, setFiles] = useState<any>({})
+
+  const openEditor = (service?: any) => {
+    setEditing(service || null)
+    setForm(service || {})
+    setFiles({})
+    setOpen(true)
+  }
+
+  const handleChange = (key: string, value: string) => setForm((p: any) => ({ ...p, [key]: value }))
+
+  const handleFile = (key: string, file: File) => setFiles((p: any) => ({ ...p, [key]: file }))
+
+  const handleSave = async () => {
+    const fd = new FormData()
+    if (editing?.id) fd.append('id', editing.id)
+    fd.append('title', form.title || '')
+    fd.append('description', form.description || '')
+    fd.append('btn_text', form.btn_text || '')
+    fd.append('btn_link', form.btn_link || '')
+    if (files.thumbnail_img) fd.append('thumbnail_img', files.thumbnail_img)
+
+    await saveService(fd).unwrap()
+    setOpen(false)
+  }
+
   return (
     <>
       <PageHeader
@@ -12,122 +53,104 @@ export function CmsServices() {
         subtitle="CMS · Services"
         description="Manage the services displayed on your landing page."
         action={
-          <Button variant="primary" size="md" onClick={() => {}} className="shrink-0">
-            <span className="inline-flex items-center gap-2">
-              <Icon name="plus" size={18} />
-              Add New Service
-            </span>
+          <Button onClick={() => openEditor()} className="bg-[#E91E63]">
+            <Icon name="plus" size={18} />
+            Add New Service
           </Button>
         }
       />
 
-      {/* Services table */}
-      <div
-        className="mb-8 overflow-hidden rounded-xl border border-gray-200"
-        style={{ boxShadow: theme.shadow.card }}
-      >
-        <table className="w-full text-left text-sm">
-          <thead>
+      {/* TABLE — unchanged visually */}
+      <div className="mb-8 overflow-hidden rounded-xl border">
+        <table className="w-full text-sm text-left ">
+          <thead className="bg-[#FFF3E0]">
             <tr>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Service</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Slug</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Status</th>
-              <th className="bg-[var(--color-table-header)] px-4 py-3 font-semibold uppercase tracking-wider text-gray-800">Actions</th>
+              <th className="px-4 py-3">service</th>
+              <th className="px-4 py-3">Slug</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white">
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-10 w-10 shrink-0 rounded bg-gray-200" aria-hidden />
-                  AI Consultation
-                </div>
-              </td>
-              <td className="px-4 py-3 text-gray-600">/ai-consultation</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Active</span>
-              </td>
-              <td className="px-4 py-3 flex gap-2">
-                <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-                <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-              </td>
-            </tr>
-            <tr className="bg-[#FDF1F5]">
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-10 w-10 shrink-0 rounded bg-gray-200" aria-hidden />
-                  Process Automation
-                </div>
-              </td>
-              <td className="px-4 py-3 text-gray-600">/process-automation</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Draft</span>
-              </td>
-              <td className="px-4 py-3 flex gap-2">
-                <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-                <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-              </td>
-            </tr>
-            <tr className="bg-white">
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-10 w-10 shrink-0 rounded bg-gray-200" aria-hidden />
-                  Data Analytics
-                </div>
-              </td>
-              <td className="px-4 py-3 text-gray-600">/data-analytics</td>
-              <td className="px-4 py-3">
-                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Draft</span>
-              </td>
-              <td className="px-4 py-3 flex gap-2">
-                <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-                <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-              </td>
-            </tr>
+            {data?.data?.map((s: any) => (
+              <tr key={s.id}>
+                <td className="px-4 py-3 flex items-center gap-3">
+                  {s.thumbnail_img ? (
+                    <img
+                      src={s.thumbnail_img}
+                      alt={s.title}
+                      className="w-16 h-16 object-cover bg-gray-50"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg text-xs text-gray-500 flex items-center justify-center">
+                      No image
+                    </div>
+                  )}
+                  {s.title}
+                </td>
+                <td className="px-4 py-3">{s.slug}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={
+                      s.is_active
+                        ? 'px-4 py-1 text-green-500 bg-green-100 rounded-2xl'
+                        : 'px-4 py-1 text-red-500 bg-red-100 rounded-2xl'
+                    }
+                  >
+                    {s.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td className="px-4 py-3 flex gap-2">
+                  <button
+                    onClick={() => openEditor(s)}
+                    className="hover:cursor-pointer hover:scale-103 transition-all"
+                  >
+                    <Icon name="edit" size={18} />
+                  </button>
+                  <button
+                    onClick={() => deleteService(s.id)}
+                    className="hover:cursor-pointer hover:scale-103 transition-all"
+                  >
+                    <Trash2 size={18} className="text-red-500!" />
+                  </button>
+                  <button
+                    onClick={() => toggleServiceStatus(s.id)}
+                    className={
+                      s.is_active
+                        ? 'px-4 border border-[#E91E63] text-[#E91E63] hover:bg-[#E91E63] hover:text-white transition-colors rounded-2xl'
+                        : 'px-4 border border-[#229ECF] text-[#229ECF] hover:bg-[#229ECF] hover:text-white transition-colors rounded-2xl'
+                    }
+                  >
+                    {s.is_active ? 'Inactive' : 'Active'}
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* Edit Service form */}
-      <Card>
-        <h2 className="mb-1 text-lg font-semibold text-[var(--color-secondary)]">Edit Service</h2>
-        <p className="mb-4 text-sm text-gray-600">Configure the service details below.</p>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Service Title</label>
-            <input type="text" defaultValue="AI Consultation" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">URL Slug</label>
-            <input type="text" defaultValue="ai-consultation" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">Short Description</label>
-            <textarea rows={3} defaultValue="Expert guidance on implementing AI." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
+      {/* MODAL — GOOD UI */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-black!">
+              {editing ? 'Edit Service' : 'Add Service'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <EditServiceForm form={form} onChange={handleChange} onFile={handleFile} />
+
+          <div className="mt-6 flex gap-3">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Service'}
+            </Button>
           </div>
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Thumbnail Image</label>
-            <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 text-sm text-[var(--color-primary)]">
-              Click or drag image here
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Settings</label>
-              <div className="mt-2 flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                <span className="text-sm">Active status</span>
-                <span className="h-6 w-11 rounded-full bg-blue-500" aria-hidden />
-              </div>
-              <div className="mt-2 flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                <span className="text-sm">Featured on Home</span>
-                <span className="h-6 w-11 rounded-full bg-gray-300" aria-hidden />
-              </div>
-            </div>
-            <label className="block text-sm font-medium text-gray-700">Button text</label>
-            <input type="text" defaultValue="Book Now" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">Button link</label>
-            <input type="text" defaultValue="http//xyzbuttontext" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-          </div>
-        </div>
-        <div className="mt-6 flex gap-3">
-          <button type="button" className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800">Cancel</button>
-          <button type="button" className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: theme.color.primary }}>Update Service</button>
-        </div>
-      </Card>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

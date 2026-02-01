@@ -16,7 +16,7 @@ function PageTitleComponent({ as = 1, children, className = '', ...props }: Page
   const Tag = as === 1 ? 'h1' : 'h2'
   const sizeClass = as === 1 ? 'text-2xl mb-6' : 'text-xl mb-4'
   return (
-    <Tag className={`${style} ${sizeClass} ${className}`} {...props}>
+    <Tag className={`text-black ${style} ${sizeClass} ${className}`} {...props}>
       {children}
     </Tag>
   )

@@ -10,7 +10,7 @@ export const ROUTES = {
   AI_RULES: '/ai-rules',
   CMS_WEB_SETTINGS: '/cms/web-settings',
   CMS_SERVICES: '/cms/services',
-  CMS_SUPPORT: '/cms/support',
+  // CMS_SUPPORT: '/cms/support',
   CMS_TESTIMONIALS: '/cms/testimonials',
   CMS_TEAM: '/cms/team',
   CMS_ARTICLES: '/cms/articles',
@@ -37,7 +37,7 @@ export const navItems: NavItem[] = [
     children: [
       { label: 'Web settings', path: ROUTES.CMS_WEB_SETTINGS },
       { label: 'Services', path: ROUTES.CMS_SERVICES },
-      { label: 'Support', path: ROUTES.CMS_SUPPORT },
+      // { label: 'Support', path: ROUTES.CMS_SUPPORT },
       { label: 'Team', path: ROUTES.CMS_TEAM },
       { label: 'Testimonials', path: ROUTES.CMS_TESTIMONIALS },
       { label: 'Articles / Blog', path: ROUTES.CMS_ARTICLES },
@@ -48,5 +48,10 @@ export const navItems: NavItem[] = [
       { label: 'Page Settings', path: ROUTES.CMS_PAGE },
     ],
   },
-  { id: 'subscription', label: 'Subscription & Payment', icon: 'credit', path: ROUTES.SUBSCRIPTION },
+  {
+    id: 'subscription',
+    label: 'Subscription & Payment',
+    icon: 'credit',
+    path: ROUTES.SUBSCRIPTION,
+  },
 ]

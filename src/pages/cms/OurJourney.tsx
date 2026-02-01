@@ -1,68 +1,87 @@
-import { Button, Card, Icon, PageHeader } from '../../components'
-import { theme } from '../../constants'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  useGetJourneysQuery,
+  useDeleteJourneyMutation,
+} from '../../redux/features/api/admin/journey'
+import { Card, Icon, PageHeader } from '../../components'
+import SkeletonLoading from '@/components/SkeletonLoading'
+import DeleteJourneyModal from '@/components/modal/DeleteJourneyModal'
+import JourneyModal from '@/components/modal/JourneyModal'
 
-/**
- * CMS Our Journey — Figma node 3997-23261. Manage journey/milestone content.
- */
 export function CmsOurJourney() {
+  const { data: journeys, isLoading } = useGetJourneysQuery(undefined)
+  const [deleteJourney, { isLoading: isDeleting }] = useDeleteJourneyMutation()
+
   return (
     <>
-      <PageHeader
-        title="Our Journey"
-        subtitle="CMS · Our Journey"
-        description="Manage journey milestones and company story."
-        action={
-          <Button variant="primary" size="md" onClick={() => {}} className="shrink-0">
-            <span className="inline-flex items-center gap-2">
-              <Icon name="plus" size={18} />
-              Add Milestone
-            </span>
-          </Button>
-        }
-      />
+      <div className="flex justify-between items-center mb-6">
+        <PageHeader
+          title="Our Journey"
+          subtitle="CMS · Journey"
+          description="Manage the growth milestones of the Mamabot ecosystem."
+        />
+        {journeys?.data.length === 0 && (
+          <JourneyModal>
+            <button className="bg-rose-500 text-white px-4 py-2 rounded-lg">+ Add Milestone</button>
+          </JourneyModal>
+        )}
+      </div>
 
-      <Card className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-[var(--color-secondary)]">Create / Edit Milestone</h2>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Title</label>
-            <input type="text" placeholder="e.g. 500+ Clients" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">Description</label>
-            <textarea rows={4} placeholder="Enter milestone description..." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-            <label className="block text-sm font-medium text-gray-700">Sort Order</label>
-            <input type="text" defaultValue="0" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" readOnly />
-          </div>
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Image URL</label>
-            <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 text-sm text-[var(--color-primary)]">
-              Click or Drag image here
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex gap-3">
-          <button type="button" className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: theme.color.primary }}>Save Milestone</button>
-          <button type="button" className="rounded-lg border border-orange-400 bg-white px-4 py-2 text-sm font-medium text-orange-600">Cancel</button>
-        </div>
-      </Card>
+      <div className="grid grid-cols-1  gap-6">
+        {isLoading ? (
+          <SkeletonLoading count={3} direction="vertical" />
+        ) : (
+          journeys?.data?.map((m: any, i: number) => (
+            <Card key={m.id || i} className="flex items-start justify-between gap-4 p-4 ">
+              <div className="flex items-center gap-4">
+                <div className="w-36 h-36 rounded-xl overflow-hidden border-2 border-sky-100 flex-shrink-0">
+                  <img
+                    src={m.image_url_1 || 'https://via.placeholder.com/150'}
+                    alt={m.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="w-36 h-36 rounded-xl overflow-hidden border-2 border-sky-100 flex-shrink-0">
+                  <img
+                    src={m.image_url_2 || 'https://via.placeholder.com/150'}
+                    alt={m.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-sky-400 mt-1">
+                    {m.count > 1000 ? `${Math.round(m.count / 1000)}k+` : m.count}
+                  </p>
+                  <p className="font-semibold text-lg text-rose-500">{m.title}</p>
+                  <p className="text-sm text-gray-600 line-clamp-2 italic mt-2">
+                    &ldquo;{m.description}&rdquo;
+                  </p>
+                </div>
+              </div>
 
-      <h2 className="mb-4 text-lg font-semibold text-[var(--color-secondary)]">Current Milestones</h2>
-      <div className="space-y-4">
-        {[
-          { title: 'Company Founded', year: '2020', desc: 'Mamabot started with a mission to support new parents.' },
-          { title: 'First 1000 Users', year: '2023', desc: 'Reached milestone with AI-powered recommendations.' },
-        ].map((m) => (
-          <Card key={m.title} className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-semibold text-gray-900">{m.title}</p>
-              <p className="text-sm text-[var(--color-primary)]">{m.year}</p>
-              <p className="mt-1 text-sm text-gray-600">{m.desc}</p>
-            </div>
-            <div className="flex gap-2">
-              <button type="button" className="p-1.5 text-gray-400 hover:text-[var(--color-primary)]" aria-label="Edit"><Icon name="edit" size={18} /></button>
-              <button type="button" className="p-1.5 text-gray-400 hover:text-red-500" aria-label="Delete"><Icon name="trash" size={18} /></button>
-            </div>
-          </Card>
-        ))}
+              <div className="flex gap-2">
+                <JourneyModal initialData={m}>
+                  <button
+                    type="button"
+                    className="p-1.5 text-gray-400! hover:text-sky-500! transition-colors"
+                    aria-label="Edit"
+                  >
+                    <Icon name="edit" size={18} className="cursor-pointer" />
+                  </button>
+                </JourneyModal>
+                <DeleteJourneyModal onConfirm={() => deleteJourney(m.id)} isLoading={isDeleting}>
+                  <button
+                    type="button"
+                    className="p-1.5 text-gray-400! hover:text-red-500! transition-colors"
+                    aria-label="Delete"
+                  >
+                    <Icon name="trash" size={18} className="text-red-500! cursor-pointer" />
+                  </button>
+                </DeleteJourneyModal>
+              </div>
+            </Card>
+          ))
+        )}
       </div>
     </>
   )
