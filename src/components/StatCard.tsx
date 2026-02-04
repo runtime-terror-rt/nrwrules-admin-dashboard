@@ -21,8 +21,8 @@ function StatCardComponent({ label, value, change, positive, icon, bgClassName }
         <div className="min-w-0 flex-1 flex flex-col justify-around gap-5">
           <p className="mb-1 text-sm xl:text-base text-gray-600">{label}</p>
           <div className="flex items-center justify-between">
-            <p className="text-3xl xl:text-5xl font-semibold text-(--color-primary)">
-              {value === undefined ? value : 0}
+            <p className="text-3xl xl:text-5xl font-semibold text-[var(--color-primary)]">
+              {value ?? 0}
             </p>
             <span
               className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${

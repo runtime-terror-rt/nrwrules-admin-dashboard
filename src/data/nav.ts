@@ -19,6 +19,7 @@ export const ROUTES = {
   CMS_ABOUT_US: '/cms/about-us',
   CMS_HERO: '/cms/hero',
   CMS_PAGE: '/cms/page',
+  CMS_RELAXATION_AUDIO: '/cms/relaxation-audio',
   SUBSCRIPTION: '/subscription',
 } as const
 
@@ -46,6 +47,7 @@ export const navItems: NavItem[] = [
       { label: 'About Us', path: ROUTES.CMS_ABOUT_US },
       { label: 'Hero Section', path: ROUTES.CMS_HERO },
       { label: 'Page Settings', path: ROUTES.CMS_PAGE },
+      { label: 'Relaxation Audio', path: ROUTES.CMS_RELAXATION_AUDIO },
     ],
   },
   {

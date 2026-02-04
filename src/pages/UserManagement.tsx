@@ -52,7 +52,11 @@ export function UserManagement() {
 
   const { data: dashboardCardsData, isLoading: isLoadingDashboardCardsData } =
     useGetDashboardCardsDataQuery({})
+
+    console.log(dashboardCardsData,"dashboardCard data")
   const { data: allUsers, isLoading: isLoadingAllUsers } = useGetDashboardUsersQuery({})
+
+  console.log(allUsers,"all user data")
   const [toggleUserStatus] = useToggleUserStatusMutation()
   const [localUsers, setLocalUsers] = useState<User[]>([])
 
@@ -76,19 +80,40 @@ export function UserManagement() {
     }
   }, [allUsers])
 
-  const displayStats = useMemo(() => {
-    if (!dashboardCardsData?.data) return adminDashboardStats
-    return [
-      { ...adminDashboardStats[0], value: dashboardCardsData.data.total_users ?? 0 },
-      { ...adminDashboardStats[1], value: dashboardCardsData.data.active_users ?? 0 },
-      { ...adminDashboardStats[2], value: dashboardCardsData.data.ai_chat_logs ?? 0 },
-      {
-        ...adminDashboardStats[3],
-        value: `${dashboardCardsData.data.postpartum_percentage ?? 0}`,
-      },
-    ]
-  }, [dashboardCardsData])
+const displayStats = useMemo(() => {
+  if (!dashboardCardsData?.data) return adminDashboardStats
 
+  const data = dashboardCardsData.data
+
+  return [
+    {
+      ...adminDashboardStats[0],
+      value: data.total_users.count,
+      change: data.total_users.change_percent,
+      positive: data.total_users.change_percent >= 0,
+    },
+    {
+      ...adminDashboardStats[1],
+      value: data.active_users.count,
+      change: data.active_users.change_percent,
+      positive: data.active_users.change_percent >= 0,
+    },
+    {
+      ...adminDashboardStats[2],
+      value: data.ai_chat_logs.count,
+      change: data.ai_chat_logs.change_percent,
+      positive: data.ai_chat_logs.change_percent >= 0,
+    },
+    {
+      ...adminDashboardStats[3],
+      value: data.postpartum_segment.percentage,
+      change: data.postpartum_segment.change_percent,
+      positive: data.postpartum_segment.change_percent >= 0,
+    },
+  ]
+}, [dashboardCardsData?.data])
+
+console.log(displayStats,"display LOgs")
   const filteredUsers = useMemo(() => {
     const q = search.trim().toLowerCase()
     return localUsers.filter((u) => {
@@ -201,21 +226,30 @@ export function UserManagement() {
         </div>
       )}
 
-      {isLoadingDashboardCardsData ? (
-        <SkeletonLoading count={4} />
-      ) : (
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {displayStats.map((s) => (
-            <StatCard
-              key={s.label}
-              label={s.label}
-              value={s.value}
-              change={s.change}
-              positive={s.positive}
-            />
-          ))}
-        </div>
-      )}
+     {isLoadingDashboardCardsData ? (
+  <SkeletonLoading count={4} height="h-24" /> // height adjustable
+) : (
+  <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {displayStats.map((s) => (
+      <StatCard
+        key={s.label}
+        label={s.label}
+        value={typeof s.value === "number" ? s.value.toLocaleString() : s.value} // number/string safe
+        change={
+          typeof s.change === "number"
+            ? s.change > 0
+              ? `↑ ${s.change}%`
+              : s.change < 0
+              ? `↓ ${Math.abs(s.change)}%`
+              : '0%'
+            : s.change ?? '0%'
+        }
+        positive={s.positive ?? true} // fallback true
+      />
+    ))}
+  </div>
+)}
+
 
       <PageTitle as={2}>User Directory</PageTitle>
       {isLoadingAllUsers ? (
