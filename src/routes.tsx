@@ -47,6 +47,9 @@ const CmsAboutUs = lazy(() =>
 )
 const CmsHero = lazy(() => import('./pages/cms/Hero').then((m) => ({ default: m.CmsHero })))
 const CmsPage = lazy(() => import('./pages/cms/Page').then((m) => ({ default: m.CmsPage })))
+const RelaxationAudio = lazy(() =>
+  import('./pages/cms/RelaxationAudio').then((m) => ({ default: m.RelaxationAudio }))
+)
 const Subscription = lazy(() =>
   import('./pages/Subscription').then((m) => ({ default: m.Subscription }))
 )
@@ -223,6 +226,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <CmsPage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="cms/relaxation-audio"
+              element={
+                <LazyPage>
+                  <RelaxationAudio />
                 </LazyPage>
               }
             />

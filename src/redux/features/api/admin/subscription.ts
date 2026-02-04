@@ -8,10 +8,19 @@ const subscription = baseApi.injectEndpoints({
       providesTags: ['Subscription'],
     }),
     updatePlan: builder.mutation({
-      query: ({ id, ...body }) => ({
-        url: `/subscription-plans/${id}`,
+      query: (body) => ({
+        url: `/subscription-plans`,
         method: 'POST',
         body,
+      }),
+      invalidatesTags: ['Subscription'],
+    }),
+
+    togglePlanStatus: builder.mutation({
+      query: (id) => ({
+        url: `/subscription-plans/toggle-status/${id}`,
+        method: 'POST',
+        body: {},
       }),
       invalidatesTags: ['Subscription'],
     }),
@@ -33,6 +42,7 @@ const subscription = baseApi.injectEndpoints({
 export const {
   useGetPlansQuery,
   useUpdatePlanMutation,
+  useTogglePlanStatusMutation,
   useGetSubscribersQuery,
   useGetPaymentsQuery,
 } = subscription

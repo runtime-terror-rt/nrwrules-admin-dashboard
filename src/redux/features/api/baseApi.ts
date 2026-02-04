@@ -67,6 +67,7 @@ export const baseApi = createApi({
     'Hydration',
     'Community',
     'Recommendations',
+    "RelaxationAudio"
   ],
   endpoints: () => ({}),
 })
