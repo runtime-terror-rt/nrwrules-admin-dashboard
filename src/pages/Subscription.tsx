@@ -137,53 +137,59 @@ export function Subscription() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-[#FEE3ED]">
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">User</th>
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">Method</th>
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">Transaction ID</th>
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">Amount</th>
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">Status</th>
-                <th className="px-4 py-3 font-semibold uppercase text-gray-800">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {paymentsLoading ? (
-                <tr>
-                  <td colSpan={6}>
-                    <SkeletonLoading count={1} direction="horizontal" />
-                  </td>
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-pink-100 scrollbar-track-transparent">
+            <table className="w-full text-left text-sm min-w-[800px]">
+              <thead>
+                <tr className="bg-[#FEE3ED]">
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">User</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">Method</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">Transaction ID</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">Amount</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 whitespace-nowrap">Date</th>
                 </tr>
-              ) : paymentsData?.data.length === 0 ? (
-                <tr className="text-center py-5">No payments found</tr>
-              ) : (
-                paymentsData?.data?.map((payment: any, i: number) => (
-                  <tr key={payment.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FDF1F5]'}>
-                    <td className="px-4 py-3 font-medium">
-                      {payment.user?.first_name} {payment.user?.last_name}
-                    </td>
-                    <td className="px-4 py-3 uppercase text-xs font-bold text-blue-600">
-                      {payment.payment_method || 'Stripe'}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-gray-500 text-xs">
-                      {payment.invoice || 'N/A'}
-                    </td>
-                    <td className="px-4 py-3 font-bold">${payment.amount}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
-                        {payment.status || 'Completed'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {payment.issued_at ? new Date(payment.issued_at).toLocaleDateString() : 'N/A'}
+              </thead>
+              <tbody className="divide-y divide-gray-50 text-black!">
+                {paymentsLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8">
+                      <SkeletonLoading count={1} direction="horizontal" height="h-10" />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : paymentsData?.data.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-10 text-gray-400 font-medium">No payments found</td>
+                  </tr>
+                ) : (
+                  paymentsData?.data?.map((payment: any, i: number) => (
+                    <tr key={payment.id} className={`hover:bg-gray-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-[#FDF1F5]/30'}`}>
+                      <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
+                        {payment.user?.first_name} {payment.user?.last_name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2.5 py-1 bg-sky-50 text-sky-600 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-sky-100">
+                          {payment.payment_method || 'Stripe'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-400 text-[11px]">
+                        {payment.invoice || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">${payment.amount}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-700 border border-green-200">
+                          {payment.status || 'Completed'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-xs">
+                        {payment.issued_at ? new Date(payment.issued_at).toLocaleDateString() : 'N/A'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 

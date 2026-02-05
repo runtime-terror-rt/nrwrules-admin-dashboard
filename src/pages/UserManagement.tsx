@@ -185,17 +185,19 @@ console.log(displayStats,"display LOgs")
       {isLoadingDashboardCardsData ? (
         <SkeletonLoading count={4} height="h-8" />
       ) : (
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <SearchInput
-            placeholder="Search users by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="min-w-[220px] max-w-xl flex-1"
-          />
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-3">
+          <div className="sm:col-span-2 lg:flex-1 min-w-[200px]">
+            <SearchInput
+              placeholder="Search users by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full"
+            />
+          </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            className="w-full lg:w-auto rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 transition-all"
             aria-label="Filter by status"
           >
             <option value="all">All status</option>
@@ -205,7 +207,7 @@ console.log(displayStats,"display LOgs")
           <select
             value={filterPhase}
             onChange={(e) => setFilterPhase(e.target.value as FilterPhase)}
-            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            className="w-full lg:w-auto rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 transition-all"
             aria-label="Filter by phase"
           >
             <option value="all">All phases</option>
@@ -215,7 +217,7 @@ console.log(displayStats,"display LOgs")
           <select
             value={filterDelivery}
             onChange={(e) => setFilterDelivery(e.target.value as FilterDelivery)}
-            className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30"
+            className="w-full lg:w-auto rounded-lg border border-[var(--color-border)] bg-white px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 transition-all"
             aria-label="Filter by delivery"
           >
             <option value="all">All delivery</option>

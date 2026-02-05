@@ -17,8 +17,6 @@ export function DashboardLayout() {
   // Use user from auth if available, otherwise fallback to static data
   const displayUser = user || currentUser
 
-  const sidebarWidth = isCollapsed ? 80 : 256
-  const MAIN_OFFSET_PX = 16 + sidebarWidth + 16
 
   return (
     <div
@@ -68,14 +66,16 @@ export function DashboardLayout() {
         }}
       />
       <main
-        className="flex-1 min-h-screen transition-all duration-300 ease-in-out p-4 md:p-8 mt-16 lg:mt-0"
+        className={`flex-1 min-w-0 min-h-screen transition-all duration-300 ease-in-out p-4 md:p-8 mt-16 lg:mt-0 ${
+          isCollapsed ? 'lg:ml-[112px]' : 'lg:ml-[288px]'
+        }`}
         style={{
-          marginLeft:
-            typeof window !== 'undefined' && window.innerWidth >= 1024 ? MAIN_OFFSET_PX : 0,
           backgroundColor: theme.color.pageBackground,
         }}
       >
-        <Outlet />
+        <div className="max-w-[1600px] mx-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   )
