@@ -12,11 +12,11 @@ export function CmsSupport() {
         subtitle="CMS · Support"
         description="Manage support channels and contact options."
         action={
-          <div className="flex gap-3">
-            <Button variant="secondary" size="md" onClick={() => {}}>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+            <Button variant="secondary" size="md" onClick={() => {}} className="w-full sm:w-auto order-2 sm:order-1">
               Cancel
             </Button>
-            <Button variant="primary" size="md" onClick={() => {}}>
+            <Button variant="primary" size="md" onClick={() => {}} className="w-full sm:w-auto order-1 sm:order-2">
               Save All Changes
             </Button>
           </div>

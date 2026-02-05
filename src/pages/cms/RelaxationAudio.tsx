@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
-import { Button, Icon, PageHeader } from '../../components'
+import { Button, PageHeader } from '../../components'
 import {
   useGetRelaxationAudiosQuery,
   useUploadRelaxationAudioMutation,
 } from '../../redux/features/api/admin/relaxationAudio'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Music, Link } from 'lucide-react'
+import { Music, Link, Edit, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import SkeletonLoading from '@/components/SkeletonLoading'
 
@@ -15,36 +15,67 @@ export function RelaxationAudio() {
   const [uploadAudio, { isLoading: isSaving }] = useUploadRelaxationAudioMutation()
 
   const [open, setOpen] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState({
     title: '',
     is_active: 1,
   })
   const [file, setFile] = useState<File | null>(null)
 
-  const openEditor = () => {
-    setForm({
-      title: '',
-      is_active: 1,
-    })
+  const openEditor = (item?: any) => {
+    if (item) {
+      setEditingId(item.id)
+      setForm({
+        title: item.title,
+        is_active: item.is_active,
+      })
+    } else {
+      setEditingId(null)
+      setForm({
+        title: '',
+        is_active: 1,
+      })
+    }
     setFile(null)
     setOpen(true)
   }
 
   const handleSave = async () => {
+    if (!form.title) {
+      toast.error('Please enter a title')
+      return
+    }
+    if (!editingId && !file) {
+      toast.error('Please upload an audio file')
+      return
+    }
+
     try {
       const fd = new FormData()
+      if (editingId) fd.append('id', String(editingId))
       fd.append('title', form.title)
       if (file) fd.append('audio_url', file)
       fd.append('is_active', String(form.is_active))
 
       await uploadAudio(fd).unwrap()
-      toast.success('Audio added successfully')
+      toast.success(editingId ? 'Audio updated successfully' : 'Audio added successfully')
       setOpen(false)
     } catch (err: any) {
       toast.error(err?.data?.message || 'Failed to save')
     }
   }
 
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this audio track?')) {
+      console.log('Delete feature (design only):', id)
+      toast.info('Delete functionality design implemented')
+    }
+  }
+
+  const handleToggleStatus = async (item: any) => {
+    console.log('Toggle status feature (design only):', item.id)
+    toast.info('Status toggle design implemented')
+  }
 
   return (
     <>
@@ -54,81 +85,163 @@ export function RelaxationAudio() {
         description="Manage relaxation audio files, music, and meditations."
         action={
           <Button onClick={() => openEditor()} className="px-4 py-2 bg-pink-500 text-white rounded-lg text-sm font-medium hover:bg-pink-600 transition-colors">
-           + Add New Plan
+            + Add New Audio
           </Button>
         }
       />
 
-      <div className="mt-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-[#FEE3ED]">
-            <tr>
-              <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800">
-                Audio Title
-              </th>
-              <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800">
-                URL / Path
-              </th>
-              <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800 text-right">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {isLoading ? (
+      {/* Desktop Table View */}
+      <div className="mt-8 hidden md:block overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-[#FEE3ED]">
               <tr>
-                <td colSpan={4} className="p-8">
-                  <SkeletonLoading count={3} />
-                </td>
+                <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800 whitespace-nowrap">
+                  Audio Title
+                </th>
+                <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800 whitespace-nowrap">
+                  URL / Path
+                </th>
+                <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800 text-center whitespace-nowrap">
+                  Status
+                </th>
+                <th className="px-6 py-4 font-semibold uppercase tracking-wider text-gray-800 text-right whitespace-nowrap">
+                  Actions
+                </th>
               </tr>
-            ) : data?.data?.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-12 text-center text-gray-500 font-medium">
-                  No audio tracks found. Click "Add New Audio" to get started.
-                </td>
-              </tr>
-            ) : (
-              data?.data?.map((item: any) => (
-                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-500">
-                        <Music size={20} />
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="p-8">
+                    <SkeletonLoading count={3} />
+                  </td>
+                </tr>
+              ) : data?.data?.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-12 text-center text-gray-500 font-medium">
+                    No audio tracks found. Click "Add New Audio" to get started.
+                  </td>
+                </tr>
+              ) : (
+                data?.data?.map((item: any) => (
+                  <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-500">
+                          <Music size={20} />
+                        </div>
+                        <span className="font-semibold text-gray-900 whitespace-nowrap">{item.title}</span>
                       </div>
-                      <span className="font-semibold text-gray-900">{item.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sky-600 font-mono text-xs">
-                      <Link size={14} className="shrink-0 text-gray-400" />
-                      <span className="truncate max-w-[200px]" title={item.audio_url}>
-                        {item.audio_url || 'No URL provided'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-sky-600 font-mono text-xs">
+                        <Link size={14} className="shrink-0 text-gray-400" />
+                        <span className="truncate max-w-[200px]" title={item.audio_url}>
+                          {item.audio_url || 'No URL provided'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleToggleStatus(item)}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight cursor-pointer transition-colors ${
+                          item.is_active
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        {item.is_active ? 'Active' : 'Inactive'}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => openEditor(item)}
+                          className="p-2 text-sky-500 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                          title="Edit"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="mt-6 grid grid-cols-1 gap-4 md:hidden">
+        {isLoading ? (
+          <SkeletonLoading count={3} />
+        ) : data?.data?.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 font-medium bg-white rounded-xl border border-gray-100 italic">
+            No audio tracks found.
+          </div>
+        ) : (
+          data?.data?.map((item: any) => (
+            <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-500">
+                    <Music size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 leading-tight">{item.title}</h3>
+                    <button
+                      onClick={() => handleToggleStatus(item)}
+                      className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tight cursor-pointer transition-colors ${
                         item.is_active
                           ? 'bg-green-100 text-green-700'
                           : 'bg-gray-100 text-gray-500'
                       }`}
                     >
                       {item.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => openEditor(item)}
+                    className="p-2 text-sky-500 hover:bg-sky-50 rounded-lg transition-all active:scale-90"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all active:scale-90"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="pt-3 border-t border-gray-50">
+                <div className="flex items-center gap-2 text-sky-600 font-mono text-[10px] bg-sky-50/50 p-2 rounded-lg break-all">
+                  <Link size={12} className="shrink-0 text-gray-400" />
+                  <span className="line-clamp-1">{item.audio_url || 'No URL provided'}</span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-800!">
-              Add New Relaxation Audio
+              {editingId ? 'Edit Relaxation Audio' : 'Add New Relaxation Audio'}
             </DialogTitle>
           </DialogHeader>
 
@@ -147,14 +260,14 @@ export function RelaxationAudio() {
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                Upload Audio File
+                {editingId ? 'Change Audio File (Optional)' : 'Upload Audio File'}
               </label>
               <div className="flex flex-col gap-2">
                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 hover:border-pink-300 transition-all cursor-pointer group">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Music className="w-8 h-8 mb-3 text-gray-400 group-hover:text-pink-500 transition-colors" />
-                    <p className="mb-2 text-sm text-gray-500 font-medium">
-                      {file ? file.name : <span className="text-pink-500">Click to upload</span>}
+                    <p className="mb-2 text-sm text-gray-500 font-medium text-center px-4 overflow-hidden text-ellipsis w-full">
+                      {file ? file.name : (editingId ? <span className="text-pink-500">Click to replace audio</span> : <span className="text-pink-500">Click to upload</span>)}
                     </p>
                     <p className="text-xs text-gray-400 uppercase tracking-tighter">MP3, WAV, or AAC (MAX. 10MB)</p>
                   </div>
@@ -204,7 +317,7 @@ export function RelaxationAudio() {
               disabled={isSaving}
               className="flex-1 rounded-xl bg-pink-500 text-white shadow-lg shadow-pink-100 hover:bg-pink-600 active:scale-95 transition-all"
             >
-              {isSaving ? 'Uploading...' : 'Upload Track'}
+              {isSaving ? (editingId ? 'Updating...' : 'Uploading...') : (editingId ? 'Update Track' : 'Upload Track')}
             </Button>
           </div>
         </DialogContent>

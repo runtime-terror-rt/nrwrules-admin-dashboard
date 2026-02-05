@@ -83,8 +83,16 @@ export function CmsAboutUs() {
         subtitle="CMS · About Us"
         description="Manage the About Us section content and images."
         action={
-          <Button variant="primary" size="md" onClick={handleSave} disabled={isUpdating}>
-            {isUpdating ? 'Saving...' : 'Save Changes'}
+          <Button 
+            variant="primary" 
+            size="md" 
+            onClick={handleSave} 
+            disabled={isUpdating}
+            className="w-full sm:w-auto"
+          >
+            <span className="inline-flex items-center justify-center w-full">
+              {isUpdating ? 'Saving...' : 'Save Changes'}
+            </span>
           </Button>
         }
       />

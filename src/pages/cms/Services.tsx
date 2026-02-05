@@ -53,81 +53,89 @@ export function Services() {
         subtitle="CMS · Services"
         description="Manage the services displayed on your landing page."
         action={
-          <Button onClick={() => openEditor()} className="bg-[#E91E63]">
+          <Button onClick={() => openEditor()} className="bg-[#E91E63] w-full sm:w-auto">
             <Icon name="plus" size={18} />
             Add New Service
           </Button>
         }
       />
 
-      {/* TABLE — unchanged visually */}
-      <div className="mb-8 overflow-hidden rounded-xl border">
-        <table className="w-full text-sm text-left ">
-          <thead className="bg-[#FFF3E0]">
-            <tr>
-              <th className="px-4 py-3">service</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.data?.map((s: any) => (
-              <tr key={s.id}>
-                <td className="px-4 py-3 flex items-center gap-3">
-                  {s.thumbnail_img ? (
-                    <img
-                      src={s.thumbnail_img}
-                      alt={s.title}
-                      className="w-16 h-16 object-cover bg-gray-50"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg text-xs text-gray-500 flex items-center justify-center">
-                      No image
-                    </div>
-                  )}
-                  {s.title}
-                </td>
-                <td className="px-4 py-3">{s.slug}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={
-                      s.is_active
-                        ? 'px-4 py-1 text-green-500 bg-green-100 rounded-2xl'
-                        : 'px-4 py-1 text-red-500 bg-red-100 rounded-2xl'
-                    }
-                  >
-                    {s.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-4 py-3 flex gap-2">
-                  <button
-                    onClick={() => openEditor(s)}
-                    className="hover:cursor-pointer hover:scale-103 transition-all"
-                  >
-                    <Icon name="edit" size={18} />
-                  </button>
-                  <button
-                    onClick={() => deleteService(s.id)}
-                    className="hover:cursor-pointer hover:scale-103 transition-all"
-                  >
-                    <Trash2 size={18} className="text-red-500!" />
-                  </button>
-                  <button
-                    onClick={() => toggleServiceStatus(s.id)}
-                    className={
-                      s.is_active
-                        ? 'px-4 border border-[#E91E63] text-[#E91E63] hover:bg-[#E91E63] hover:text-white transition-colors rounded-2xl'
-                        : 'px-4 border border-[#229ECF] text-[#229ECF] hover:bg-[#229ECF] hover:text-white transition-colors rounded-2xl'
-                    }
-                  >
-                    {s.is_active ? 'Inactive' : 'Active'}
-                  </button>
-                </td>
+      {/* TABLE — Responsive */}
+      <div className="mb-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left min-w-[800px]">
+            <thead className="bg-[#FFF3E0]">
+              <tr>
+                <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800">Service</th>
+                <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800">Slug</th>
+                <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 text-center">Status</th>
+                <th className="px-6 py-4 font-bold uppercase tracking-wider text-gray-800 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-50 text-black!">
+              {data?.data?.map((s: any) => (
+                <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-4">
+                      {s.thumbnail_img ? (
+                        <img
+                          src={s.thumbnail_img}
+                          alt={s.title}
+                          className="w-14 h-14 object-cover rounded-lg shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-gray-100 rounded-lg text-[10px] text-gray-400 flex items-center justify-center border border-dashed border-gray-200">
+                          No image
+                        </div>
+                      )}
+                      <span className="font-semibold text-gray-900">{s.title}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-gray-500">{s.slug}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
+                        s.is_active
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {s.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => openEditor(s)}
+                        className="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
+                        title="Edit Service"
+                      >
+                        <Icon name="edit" size={18} />
+                      </button>
+                      <button
+                        onClick={() => deleteService(s.id)}
+                        className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete Service"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => toggleServiceStatus(s.id)}
+                        className={`ml-2 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-xl transition-all ${
+                          s.is_active
+                            ? 'border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white'
+                            : 'border-sky-200 text-sky-600 hover:bg-sky-600 hover:text-white'
+                        }`}
+                      >
+                        {s.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* MODAL — GOOD UI */}

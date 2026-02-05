@@ -77,9 +77,9 @@ export function CmsHero() {
             onClick={() => {
               handleUpdateHero()
             }}
-            className="shrink-0"
+            className="w-full sm:w-auto"
           >
-            <span className="inline-flex items-center gap-2">
+            <span className="inline-flex items-center justify-center gap-2 w-full">
               <Check size={18} /> {isUpdating ? 'Saving...' : 'Save Changes'}
             </span>
           </Button>

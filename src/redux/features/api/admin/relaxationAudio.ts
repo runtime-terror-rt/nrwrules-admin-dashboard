@@ -19,15 +19,12 @@ const relaxationAudioApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['RelaxationAudio'],
     }),
-
-
   }),
 })
 
 export const {
   useGetRelaxationAudiosQuery,
   useUploadRelaxationAudioMutation,
-
 } = relaxationAudioApi
 
 export default relaxationAudioApi

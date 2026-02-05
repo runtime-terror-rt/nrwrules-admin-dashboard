@@ -167,7 +167,7 @@ export function Analytics() {
       {/* ------------------------ */}
 
       <Card className="mb-8 p-4">
-        <h3 className="mb-4 text-base font-semibold text-[var(--color-secondary)]">
+        <h3 className="mb-4 text-base font-semibold text-sky-400!">
           User Activity by Phase (Last 4 Weeks)
         </h3>
         <div className="flex h-40 items-end justify-around gap-4">
@@ -179,7 +179,7 @@ export function Analytics() {
                 title="Pregnancy"
               />
               <div
-                className="w-1/2 rounded-t bg-[var(--color-secondary)]"
+                className="w-1/2 rounded-t bg-[var(--color-primary)]"
                 style={{ height: `${(postpartum / Y_MAX_PHASE) * 100}%` }}
                 title="Postpartum"
               />
@@ -195,14 +195,14 @@ export function Analytics() {
         </div>
         <div className="mt-1 flex justify-center gap-6 text-xs">
           <span className="text-[var(--color-primary)]">Pregnancy</span>
-          <span className="text-[var(--color-secondary)]">Postpartum</span>
+          <span className="text-[var(--color-primary)]">Postpartum</span>
         </div>
       </Card>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {dailySummaryCards.map((c) => (
           <Card key={c.label} className={`p-4 ${c.color}`}>
-            <p className="mb-1 text-sm text-gray-600">{c.label}</p>
+            <p className="mb-1 text-sm  ">{c.label}</p>
             <p className={`text-2xl font-bold ${c.valueColor}`}>{c.value}</p>
           </Card>
         ))}

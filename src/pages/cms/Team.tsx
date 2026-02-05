@@ -47,23 +47,23 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold text-sky-500!">
               {initialData ? 'Edit Team Member' : 'Add Team Member'}
             </h2>
             <p className="text-gray-400 text-sm">Manage profile details and permissions.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="px-6 py-2 border border-orange-200 text-orange-400 rounded-lg"
+              className="flex-1 sm:flex-none px-6 py-2.5 border border-orange-200 text-orange-400 rounded-xl hover:bg-orange-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
-              className="px-6 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-rose-500 text-white rounded-xl hover:bg-rose-600 shadow-lg shadow-rose-100 transition-all active:scale-95"
             >
               {isLoading ? 'Saving...' : 'Update'}
             </button>
@@ -185,14 +185,14 @@ export const CmsTeam = () => {
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-sky-500!">Team Management</h1>
-          <p className="text-gray-500 text-sm">Manage your team members and their roles.</p>
+          <h1 className="text-2xl font-bold text-sky-500!">Team Management</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage your team members and their roles.</p>
         </div>
         <button
           onClick={handleAdd}
-          className="bg-rose-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-rose-600 transition"
+          className="w-full sm:w-auto bg-rose-500 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-rose-600 shadow-lg shadow-rose-100 transition-all active:scale-95 text-sm font-bold"
         >
           <span className="text-xl">+</span> Add Member
         </button>
