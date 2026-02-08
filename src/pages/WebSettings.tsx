@@ -35,7 +35,7 @@ type WebSetting = {
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="p-5 xl:p-8 bg-white rounded-2xl my-8">
-    <h2 className="mb-4 text-lg font-semibold">{title}</h2>
+    <h2 className="mb-4 text-lg font-semibold text-[#229ECF]" style={{ color: '#229ECF' }}>{title}</h2>
     {children}
   </div>
 )
@@ -192,7 +192,7 @@ export function WebSettings() {
       </Section>
 
       {/* CONTACT */}
-      <Section title="Contact & Social Information">
+      <Section  title="Contact & Social Information">
         <LabelInput
           label="Instagram URL"
           value={form.insta_link}

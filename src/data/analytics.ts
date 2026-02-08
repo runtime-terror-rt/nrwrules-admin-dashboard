@@ -41,7 +41,7 @@ export const userActivityByPhaseData: { pregnancy: number; postpartum: number }[
 
 export const dailySummaryCards: { label: string; value: number; color: string; valueColor: string }[] = [
   { label: 'Mood Checks', value: 55, color: 'bg-[#FEE3ED]', valueColor: 'text-[var(--color-primary)]' },
-  { label: 'Health Logs', value: 34, color: 'bg-[#E3F2FD]', valueColor: 'text-[var(--color-secondary)]' },
+  { label: 'Health Logs', value: 34, color: 'bg-[#E3F2FD]', valueColor: 'text-sky-600' },
   { label: 'Recommendations Viewed', value: 42, color: 'bg-amber-50', valueColor: 'text-amber-600' },
 ]
 
