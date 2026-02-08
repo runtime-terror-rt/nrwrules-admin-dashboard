@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import SkeletonLoading from '@/components/SkeletonLoading'
 import {
   useDeleteTeamMemberMutation,
@@ -7,6 +6,7 @@ import {
 } from '@/redux/features/api/admin/team'
 import { Edit, Trash2, User } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
 
 const TeamMemberModal = ({ onClose, initialData }: any) => {
   const [upsertMember, { isLoading }] = useUpsertTeamMemberMutation()
@@ -182,6 +182,45 @@ export const CmsTeam = () => {
     setIsModalOpen(true)
   }
 
+  const handleDelete = (id: string) => {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl mx-2',
+        cancelButton: 'bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-4 rounded-xl mx-2',
+      },
+      buttonsStyling: false,
+    })
+    swalWithBootstrapButtons
+      .fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true,
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          deleteMember(id)
+          swalWithBootstrapButtons.fire({
+            title: 'Deleted!',
+            text: 'Your file has been deleted.',
+            icon: 'success',
+          })
+        } else if (
+          /* Read more about handling dismissals below */
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire({
+            title: 'Cancelled',
+            text: 'Your imaginary file is safe :)',
+            icon: 'error',
+          })
+        }
+      })
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -247,7 +286,7 @@ export const CmsTeam = () => {
                     <Edit size={18} /> Edit
                   </button>
                   <button
-                    onClick={() => deleteMember(member.id)}
+                    onClick={() => handleDelete(member.id)}
                     className="px-3 py-2 border border-sky-100 bg-sky-50 text-sky-400 rounded-lg hover:bg-rose-50 hover:text-rose-500 transition"
                   >
                     <Trash2 size={18} />
