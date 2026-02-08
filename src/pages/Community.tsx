@@ -5,6 +5,7 @@ import { communityFilterTabs, communityPosts, communityStats, type CommunityPost
 import { useGetCommunityStateCardsDataQuery } from '../redux/features/api/admin/communityMonitoring'
 import SkeletonLoading from '@/components/SkeletonLoading'
 import { useGetCommunityPostsQuery } from '../redux/features/api/user/community'
+import Swal from 'sweetalert2'
 
 type FilterTabId = 'all' | 'active' | 'inactive' | 'reported'
 
@@ -55,8 +56,43 @@ export function Community() {
   }, [posts, search, activeFilter])
 
   const handleDeletePost = (post: CommunityPost) => {
-    setPosts((prev) => prev.filter((p) => p.id !== post.id))
-    setSelectedPost(null)
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl mx-2',
+        cancelButton: 'bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-4 rounded-xl mx-2',
+      },
+      buttonsStyling: false,
+    })
+    swalWithBootstrapButtons
+      .fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true,
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          setPosts((prev) => prev.filter((p) => p.id !== post.id))
+          setSelectedPost(null)
+          swalWithBootstrapButtons.fire({
+            title: 'Deleted!',
+            text: 'Your post has been deleted.',
+            icon: 'success',
+          })
+        } else if (
+          /* Read more about handling dismissals below */
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire({
+            title: 'Cancelled',
+            text: 'Your post is safe :)',
+            icon: 'error',
+          })
+        }
+      })
   }
 
   const handleToggleReported = (post: CommunityPost) => {
@@ -129,7 +165,7 @@ export function Community() {
                 onClick={() => setActiveFilter(t.id)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   activeFilter === t.id
-                    ? 'bg-[var(--color-active-nav)] text-[var(--color-secondary)]'
+                    ? 'bg-pink-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -238,13 +274,19 @@ export function Community() {
             </section>
 
             <div className="flex flex-wrap gap-2 border-t border-gray-100 pt-4">
-              <Button variant="primary" size="sm" type="button">
+              <Button 
+                variant="primary" 
+                size="sm" 
+                type="button"
+                className="bg-sky-600 hover:bg-sky-700 text-white border-none"
+              >
                 Edit
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
                 type="button"
+                className="bg-gray-600 hover:bg-gray-700 text-white border-none"
                 onClick={() => handleToggleReported(selectedPost)}
               >
                 {selectedPost.reported ? 'Dismiss report' : 'Mark as reported'}
@@ -253,6 +295,7 @@ export function Community() {
                 variant="danger"
                 size="sm"
                 type="button"
+                className="bg-rose-600 hover:bg-rose-700 text-white border-none"
                 onClick={() => handleDeletePost(selectedPost)}
               >
                 Delete post
@@ -295,10 +338,10 @@ export function Community() {
             />
           </div>
           <div className="flex gap-2 pt-2">
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" className="bg-pink-600 hover:bg-pink-700 text-white border-none">
               Add post
             </Button>
-            <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)}>
+            <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)} className="bg-gray-500 hover:bg-gray-600 text-white border-none">
               Cancel
             </Button>
           </div>
