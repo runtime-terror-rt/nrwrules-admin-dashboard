@@ -13,6 +13,7 @@ import {
 } from '@/redux/features/api/admin/pageSetting'
 import TimeConverter from '@/components/TimeConverter'
 import { Plus } from 'lucide-react'
+import RichTextEditor from '@/components/TextEditor/RichTextEditor'
 
 // --- Sub-Component: Page Form Modal ---
 const PageFormModal = ({
@@ -129,14 +130,17 @@ const PageFormModal = ({
                   </div>
 
                   {/* Editor */}
-                  <EditorContent
+                  {/* <EditorContent
                     editor={editor}
                     className="min-h-[220px] p-4 text-sm focus:outline-none"
+                  /> */}
+                  <RichTextEditor
+                    value={form.content}
+                    onChange={(html) => setForm({ ...form, content: html })}
                   />
                 </div>
               </div>
             </div>
-
             {/* Right Column: Settings */}
             <div className="space-y-8">
               <div>
