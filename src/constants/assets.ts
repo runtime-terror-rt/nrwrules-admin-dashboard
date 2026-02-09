@@ -36,6 +36,7 @@ export const ASSETS = {
   },
   images: {
     placeholder: `${BASE}/images/placeholder.svg`,
+    medic: `${BASE}/assets/medic-icon-vector-9905677 (1).jpg`,
     logo: `${BASE}/images/logo.svg`,
   },
 } as const

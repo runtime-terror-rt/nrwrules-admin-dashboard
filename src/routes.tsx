@@ -26,6 +26,7 @@ const WebSettings = lazy(() =>
 const CmsServices = lazy(() =>
   import('./pages/cms/Services').then((m) => ({ default: m.Services }))
 )
+const CmsDoctor = lazy(() => import('./pages/cms/Doctor').then((m) => ({ default: m.DoctorPage })))
 // const CmsSupport = lazy(() =>
 //   import('./pages/cms/Support').then((m) => ({ default: m.CmsSupport }))
 // )
@@ -154,6 +155,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <CmsServices />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="cms/doctor"
+              element={
+                <LazyPage>
+                  <CmsDoctor />
                 </LazyPage>
               }
             />

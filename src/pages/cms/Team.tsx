@@ -1,10 +1,11 @@
+import { Button, PageHeader } from '@/components'
 import SkeletonLoading from '@/components/SkeletonLoading'
 import {
   useDeleteTeamMemberMutation,
   useGetTeamsQuery,
   useUpsertTeamMemberMutation,
 } from '@/redux/features/api/admin/team'
-import { Edit, Trash2, User } from 'lucide-react'
+import { Edit, Plus, Trash2, User } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 
@@ -222,20 +223,20 @@ export const CmsTeam = () => {
   }
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-sky-500!">Team Management</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage your team members and their roles.</p>
-        </div>
-        <button
-          onClick={handleAdd}
-          className="w-full sm:w-auto bg-rose-500 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-rose-600 shadow-lg shadow-rose-100 transition-all active:scale-95 text-sm font-bold"
-        >
-          <span className="text-xl">+</span> Add Member
-        </button>
-      </div>
+    <>
+    
+           <PageHeader
+                   title="Team Management"
+                   subtitle="CMS · Team Management"
+                   description="Manage your team memoers and their roles."
+                   action={
+                     <Button onClick={() => handleAdd()} className="bg-[#E91E63] w-full sm:w-auto">
+                     
+                       <Plus size={18}/>
+                       Add Member
+                     </Button>
+                   }
+                 />
 
       {/* Search Bar */}
       <div className="relative mb-8">
@@ -306,6 +307,6 @@ export const CmsTeam = () => {
           initialData={selectedMember}
         />
       )}
-    </div>
+    </>
   )
 }

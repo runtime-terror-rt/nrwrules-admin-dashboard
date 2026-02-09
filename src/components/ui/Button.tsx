@@ -9,8 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        primary: 'bg-[#E91E63] text-white hover:bg-[#E91E63]/90',
+        default: 'bg-[var(--main-brand-buttons-headings,#E91E63)] text-[var(--backgrounds-borders,#F5F5F5)] hover:bg-[var(--main-brand-buttons-headings,#E91E63)]/90 font-["DM_Sans"] text-[18px] font-medium leading-[145%]',
+        primary: 'bg-[var(--main-brand-buttons-headings,#E91E63)] text-[var(--backgrounds-borders,#F5F5F5)] hover:bg-[var(--main-brand-buttons-headings,#E91E63)]/90 font-["DM_Sans"] text-[18px] font-medium leading-[145%]',
         secondary: 'bg-[#229ECF] text-white hover:bg-[#229ECF]/80',
         success: 'bg-[#22C55E] text-white hover:bg-[#22C55E]/80',
         danger: 'bg-[#DC2626] text-white hover:bg-[#DC2626]/80',

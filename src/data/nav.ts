@@ -10,6 +10,7 @@ export const ROUTES = {
   AI_RULES: '/ai-rules',
   CMS_WEB_SETTINGS: '/cms/web-settings',
   CMS_SERVICES: '/cms/services',
+  CMS_DOCTOR: '/cms/doctor',
   // CMS_SUPPORT: '/cms/support',
   CMS_TESTIMONIALS: '/cms/testimonials',
   CMS_TEAM: '/cms/team',
@@ -38,6 +39,7 @@ export const navItems: NavItem[] = [
     children: [
       { label: 'Web settings', path: ROUTES.CMS_WEB_SETTINGS },
       { label: 'Services', path: ROUTES.CMS_SERVICES },
+      { label: 'Doctor', path: ROUTES.CMS_DOCTOR },
       // { label: 'Support', path: ROUTES.CMS_SUPPORT },
       { label: 'Team', path: ROUTES.CMS_TEAM },
       { label: 'Testimonials', path: ROUTES.CMS_TESTIMONIALS },

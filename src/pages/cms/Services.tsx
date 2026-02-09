@@ -9,7 +9,7 @@ import {
 } from '../../redux/features/api/admin/crm'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import EditServiceForm from './services/EditServiceForm'
-import { Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 
 export function Services() {
   const { data } = useGetServiceDataQuery()
@@ -54,7 +54,8 @@ export function Services() {
         description="Manage the services displayed on your landing page."
         action={
           <Button onClick={() => openEditor()} className="bg-[#E91E63] w-full sm:w-auto">
-            <Icon name="plus" size={18} />
+          
+            <Plus size={18}/>
             Add New Service
           </Button>
         }

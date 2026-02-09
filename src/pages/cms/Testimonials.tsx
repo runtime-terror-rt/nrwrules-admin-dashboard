@@ -4,8 +4,8 @@ import {
   useDeleteTestimonialMutation,
   useGetTestimonialsQuery,
 } from '@/redux/features/api/admin/testimonials'
-import { Edit, Trash2, Quote } from 'lucide-react'
-import { Icon } from '../../components'
+import { Edit, Trash2, Quote, Plus } from 'lucide-react'
+import { Button, Icon, PageHeader } from '../../components'
 import React, { useEffect, useState } from 'react'
 
 const TestimonialModal = ({ onClose, initialData }: any) => {
@@ -154,8 +154,8 @@ export const CmsTestimonials = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null)
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-sky-500!">Testimonials</h1>
           <p className="text-gray-500 text-sm mt-1">Manage user impact stories and feedback.</p>
@@ -169,7 +169,23 @@ export const CmsTestimonials = () => {
         >
           <span className="text-xl">+</span> Add Testimonial
         </button>
-      </div>
+      </div> */}
+
+      <PageHeader
+                   title="Testimonials"
+                   subtitle="CMS ·Testimonialss"
+                   description="Manage what your customers say about you."
+                   action={
+                     <Button onClick={() => {
+            setSelectedItem(null)
+            setIsModalOpen(true)
+          }} className="bg-[#E91E63] w-full sm:w-auto">
+                     
+                       <Plus size={18}/>
+                       Add Testimonial
+                     </Button>
+                   }
+                 />
 
       {isLoading ? (
         <SkeletonLoading count={3} />
