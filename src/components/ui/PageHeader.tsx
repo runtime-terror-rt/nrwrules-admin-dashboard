@@ -18,7 +18,7 @@ export interface PageHeaderProps {
  */
 function PageHeaderComponent({ title, description, action }: PageHeaderProps) {
   return (
-    <div className="my-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between ">
+    <div className="mb-8 mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between ">
       <div>
         <PageTitle className="text-[#229ECF]!" as={1}>
           {title}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
 import { Icon, PageHeader } from '../../components'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import { Dialog, DialogContent, DialogTrigger, DialogClose } from '@/components/ui/dialog'
@@ -197,7 +197,7 @@ const PageFormModal = ({
               </div>
             </div>
           </div>
-          <div className="flex gap-3 mt-4 mt-10">
+          <div className="flex gap-3 mt-10">
             <DialogClose className="px-6 py-2 border border-orange-400 text-orange-500 rounded-lg font-medium hover:bg-orange-50 transition-colors">
               Cancel
             </DialogClose>

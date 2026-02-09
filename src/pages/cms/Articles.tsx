@@ -8,6 +8,7 @@ import {
   useGetCategoriesQuery,
   useUpsertArticleMutation,
 } from '@/redux/features/api/admin/articles'
+import { PageHeader } from '@/components'
 
 const ArticleModal = ({ initialData, onCancel }: any) => {
   const { data: catResponse } = useGetCategoriesQuery({})
@@ -242,7 +243,13 @@ export const CmsArticles = () => {
   }
 
   return (
-    <div className="p-6 min-h-screen text-white">
+   <>
+
+     <PageHeader
+        title="Articles/ Blog Management"
+        subtitle="CMS · Articles/ Blog Management"
+      />
+    <div className=" min-h-screen text-white">
       {/* Header */}
       <div className="bg-white p-4 rounded-xl">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6 ">
@@ -254,7 +261,7 @@ export const CmsArticles = () => {
           </div>
           <button
             onClick={handleAddNew}
-            className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition text-sm font-semibold shadow-lg shadow-rose-100"
+            className="w-full sm:w-auto bg-[#E91E63]  text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition text-sm font-semibold shadow-lg shadow-rose-100"
           >
             <Plus size={18} /> New Content
           </button>
@@ -371,5 +378,8 @@ export const CmsArticles = () => {
         )}
       </div>
     </div>
+   
+   
+   </>
   )
 }
