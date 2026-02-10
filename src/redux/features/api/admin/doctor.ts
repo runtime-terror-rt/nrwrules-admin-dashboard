@@ -39,9 +39,9 @@ const doctorsApi = baseApi.injectEndpoints({
       invalidatesTags: ["Doctor"],
     }),
 
-    updateDoctor: builder.mutation<CreateDoctorResponse, FormData>({
-      query: (formData) => ({
-        url: "/doctors",
+    updateDoctor: builder.mutation<CreateDoctorResponse, { id: number; formData: FormData }>({
+      query: ({ id, formData }) => ({
+        url: `/doctor_update/${id}`,
         method: "POST",
         body: formData,
         // Same here — no Content-Type

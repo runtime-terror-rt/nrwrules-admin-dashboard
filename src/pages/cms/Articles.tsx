@@ -334,7 +334,7 @@ export const CmsArticles = () => {
                   </span>
                 </div>
                 
-                <h3 className="font-bold text-xl text-gray-900 mb-2 group-hover:text-rose-500 transition-colors">{article.title}</h3>
+                <h3 className="font-bold text-xl text-gray-900! mb-2 group-hover:text-rose-500 transition-colors">{article.title}</h3>
                 <p className="text-gray-500 text-sm line-clamp-2 md:line-clamp-3 mb-6 leading-relaxed">
                   {article.short_description}
                 </p>

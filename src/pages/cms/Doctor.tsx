@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Edit, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Edit } from 'lucide-react'
 import { Button, PageHeader } from '@/components'
 import {
   useGetDoctorsQuery,
@@ -16,7 +16,6 @@ import { ASSETS } from '@/constants/assets'
 interface DoctorFormData {
   name: string
   specialty: string
-  is_active: boolean
   imageFile: File | null
   imagePreview: string
 }
@@ -27,34 +26,27 @@ export function DoctorPage() {
   const [createDoctor, { isLoading: isCreating }] = useCreateDoctorMutation()
   const [updateDoctor, { isLoading: isUpdating }] = useUpdateDoctorMutation()
   const [deleteDoctor] = useDeleteDoctorMutation()
-  const [toggleDoctorStatus] = useToggleDoctorStatusMutation()
+  const [toggleStatus] = useToggleDoctorStatusMutation()
+  
 
   // State
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingDoctorId, setEditingDoctorId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
   const [formData, setFormData] = useState<DoctorFormData>({
     name: '',
     specialty: '',
-    is_active: true,
     imageFile: null,
-    imagePreview: ASSETS.images.placeholder,
+    imagePreview: ASSETS.images.medic,
   })
 
-  const doctors = doctorResponse?.data || []
   const isSaving = isCreating || isUpdating
-
-  // Helper to check if doctor is active
-  const isActive = (doctor: Doctor) => {
-    const val = doctor.is_active
-    return val === true || val === 1 || val === '1'
-  }
+  const doctors = doctorResponse?.data || []
 
   const openAddForm = () => {
-    setEditingDoctorId(null)
+    setEditId(null)
     setFormData({
       name: '',
       specialty: '',
-      is_active: true,
       imageFile: null,
       imagePreview: ASSETS.images.medic,
     })
@@ -62,11 +54,10 @@ export function DoctorPage() {
   }
 
   const openEditForm = (doctor: Doctor) => {
-    setEditingDoctorId(doctor.id)
+    setEditId(doctor.id)
     setFormData({
       name: doctor.name,
       specialty: doctor.specialty,
-      is_active: isActive(doctor),
       imageFile: null,
       imagePreview: doctor.image || ASSETS.images.medic,
     })
@@ -98,43 +89,28 @@ export function DoctorPage() {
     try {
       // Create FormData
       const data = new FormData()
-      data.append('name', formData.name)
-      data.append('specialty', formData.specialty)
-      data.append('is_active', formData.is_active ? '1' : '0')
-
-      // If editing, append the doctor ID
-      if (editingDoctorId) {
-        data.append('id', editingDoctorId.toString())
-      }
+      data.append('name', formData.name.trim())
+      data.append('specialty', formData.specialty.trim())
 
       if (formData.imageFile) {
         data.append('image', formData.imageFile)
       }
 
-      // Submit to API
-      const result = editingDoctorId
-        ? await updateDoctor(data).unwrap()
-        : await createDoctor(data).unwrap()
+      let result
+      if (editId) {
+        // For update, append id
+        result = await updateDoctor({ id: editId, formData: data }).unwrap()
+      } else {
+        result = await createDoctor(data).unwrap()
+      }
 
       if (result.success) {
-        toast.success(
-          result.message || `Doctor ${editingDoctorId ? 'updated' : 'created'} successfully!`
-        )
-        setIsFormOpen(false)
-        setEditingDoctorId(null)
-        setFormData({
-          name: '',
-          specialty: '',
-          is_active: true,
-          imageFile: null,
-          imagePreview: ASSETS.images.medic,
-        })
+        toast.success(result.message || `Doctor ${editId ? 'updated' : 'created'} successfully!`)
+        closeForm()
       }
     } catch (error: any) {
       console.error('Error saving doctor:', error)
-      toast.error(
-        error?.data?.message || `Failed to ${editingDoctorId ? 'update' : 'create'} doctor`
-      )
+      toast.error(error?.data?.message || `Failed to ${editId ? 'update' : 'create'} doctor`)
     }
   }
 
@@ -165,23 +141,22 @@ export function DoctorPage() {
 
   const handleToggleStatus = async (id: number) => {
     try {
-      const response = await toggleDoctorStatus(id).unwrap()
+      const response = await toggleStatus(id).unwrap()
       if (response.success) {
-        toast.success(response.message || 'Doctor status updated successfully!')
+        toast.success(response.message || 'Status updated successfully!')
       }
     } catch (error: any) {
-      console.error('Error toggling doctor status:', error)
-      toast.error(error?.data?.message || 'Failed to update doctor status')
+      console.error('Error toggling status:', error)
+      toast.error(error?.data?.message || 'Failed to update status')
     }
   }
 
   const closeForm = () => {
     setIsFormOpen(false)
-    setEditingDoctorId(null)
+    setEditId(null)
     setFormData({
       name: '',
       specialty: '',
-      is_active: true,
       imageFile: null,
       imagePreview: ASSETS.images.medic,
     })
@@ -210,7 +185,7 @@ export function DoctorPage() {
         <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100 mb-8 animate-in slide-in-from-top-4 duration-300">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h2 className=" text-xl font-semibold text-gray-700!">
-              {editingDoctorId ? 'Edit Doctor' : 'Add New Doctor'}
+              {editId ? 'Edit Doctor' : 'Add New Doctor'}
             </h2>
 
             <div className="flex gap-3 self-end sm:self-auto">
@@ -226,7 +201,7 @@ export function DoctorPage() {
                 disabled={isSaving}
                 className="px-8 py-2 bg-[#E91E63] text-white rounded-lg hover:bg-[#D81B60] transition-colors disabled:opacity-50 cursor-pointer font-medium shadow-md shadow-[#E91E63]/20"
               >
-                {isSaving ? 'Saving...' : editingDoctorId ? 'Update' : 'Save'}
+                {isSaving ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>
@@ -254,22 +229,6 @@ export function DoctorPage() {
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
                   placeholder="Pregnancy Specialist"
                 />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 text-sm mb-3 font-medium">Status</label>
-                <div className="flex items-center gap-3">
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_active}
-                      onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
-                  </label>
-                  <span className="text-sm text-gray-600 font-medium">Active status</span>
-                </div>
               </div>
             </div>
 
@@ -339,7 +298,6 @@ export function DoctorPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           {doctors.map((doctor) => {
-            const active = isActive(doctor)
             return (
               <div
                 key={doctor.id}
@@ -359,7 +317,7 @@ export function DoctorPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => openEditForm(doctor)}
-                      className="text-cyan-500 hover:text-cyan-600 p-2 bg-cyan-50 rounded-lg transition-colors cursor-pointer"
+                      className="text-cyan-600 hover:text-cyan-700 p-2 bg-cyan-50 rounded-lg transition-colors cursor-pointer"
                       title="Edit"
                     >
                       <Edit size={18} />
@@ -374,22 +332,26 @@ export function DoctorPage() {
                   </div>
                 </div>
 
-                <h3 className="font-semibold text-gray-800 mb-1">{doctor.name}</h3>
+                <h3 className="font-semibold text-gray-800! mb-1">{doctor.name}</h3>
                 <p className="text-cyan-600 text-sm font-medium mb-2">{doctor.specialty}</p>
-                <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-50">
+
+                <div className="flex items-center justify-between mt-4 border-t border-gray-50 pt-4">
                   <span
-                    className={`inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                      doctor.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}
                   >
-                    {active ? 'Active' : 'Inactive'}
+                    {doctor.is_active ? 'Active' : 'Inactive'}
                   </span>
-                  <button
-                    onClick={() => handleToggleStatus(doctor.id)}
-                    className={`w-10 h-5 rounded-full relative transition-colors duration-200 ${active ? 'bg-cyan-500' : 'bg-gray-300'} cursor-pointer`}
-                  >
-                    <div
-                      className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all duration-200 shadow-sm ${active ? 'left-[22px]' : 'left-0.5'}`}
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={!!doctor.is_active}
+                      onChange={() => handleToggleStatus(doctor.id)}
                     />
-                  </button>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
                 </div>
               </div>
             )
