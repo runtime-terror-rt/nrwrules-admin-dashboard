@@ -15,7 +15,7 @@ import TimeConverter from '@/components/TimeConverter'
 import { Plus } from 'lucide-react'
 import RichTextEditor from '@/components/TextEditor/RichTextEditor'
 import { useEditPageMutation } from '@/redux/features/api/admin/EditPage'
-
+import toast, { Toaster } from 'react-hot-toast'
 // Page Form Modal
 const PageFormModal = ({
   children,
@@ -227,17 +227,29 @@ export function CmsPage() {
       if (pageId) {
         //  Update existing page
         await editPage({ pageId, body: formData }).unwrap()
+        toast.success('Page updated successfully!')
       } else {
         //  Create new page
         await createUpdate(formData).unwrap()
+        toast.success('Page created successfully!')
       }
     } catch (err) {
       console.error(err)
     }
   }
+  const handleDelete = async (pageId: number) => {
+    try {
+      await deletePage(pageId).unwrap()
+      toast.success('Page deleted successfully!')
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err?.data?.message || 'Failed to delete page!')
+    }
+  }
 
   return (
     <div className="p-4">
+      <Toaster position="top-right" reverseOrder={false} />
       <PageHeader
         title="Pages"
         subtitle="CMS · Page Settings"
@@ -298,7 +310,7 @@ export function CmsPage() {
                       </button>
                     </PageFormModal>
                     <button
-                      onClick={() => deletePage(page.id)}
+                      onClick={() => handleDelete(page.id)}
                       className="text-[#E91E63] p-1 hover:bg-pink-50 rounded transition-colors"
                     >
                       <Icon name="trash" size={20} />
