@@ -14,8 +14,9 @@ import {
 import TimeConverter from '@/components/TimeConverter'
 import { Plus } from 'lucide-react'
 import RichTextEditor from '@/components/TextEditor/RichTextEditor'
+import { useEditPageMutation } from '@/redux/features/api/admin/EditPage'
 
-// --- Sub-Component: Page Form Modal ---
+// Page Form Modal
 const PageFormModal = ({
   children,
   initialData,
@@ -66,7 +67,7 @@ const PageFormModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="w-[95vw]! max-w-7xl! bg-white p-0 overflow-hidden border-none shadow-2xl">
+      <DialogContent className="w-[95vw]! h-[90vh] md:h-[85vh]  max-w-xl! md:max-w-5xl! bg-white p-0 overflow-hidden overflow-y-auto border-none shadow-2xl">
         <div className="p-6">
           <div className="flex justify-between items-center mb-2">
             <div>
@@ -214,15 +215,22 @@ const PageFormModal = ({
   )
 }
 
-// --- Main Page Component ---
+//Main Page Component
 export function CmsPage() {
   const { data: pages, isLoading } = useGetPagesQuery(undefined)
   const [createUpdate] = useCreateUpdatePageMutation()
   const [deletePage] = useDeletePageMutation()
+  const [editPage] = useEditPageMutation()
 
-  const handleSave = async (formData: any, id?: number) => {
+  const handleSave = async (formData: any, pageId?: number) => {
     try {
-      await createUpdate({ ...formData, id }).unwrap()
+      if (pageId) {
+        //  Update existing page
+        await editPage({ pageId, body: formData }).unwrap()
+      } else {
+        //  Create new page
+        await createUpdate(formData).unwrap()
+      }
     } catch (err) {
       console.error(err)
     }
@@ -237,7 +245,7 @@ export function CmsPage() {
         action={
           <PageFormModal onSave={(data) => handleSave(data)}>
             <button className="bg-[#E91E63] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium">
-              <Plus size={18} /> Add Member
+              <Plus size={18} /> Add Page
             </button>
           </PageFormModal>
         }
