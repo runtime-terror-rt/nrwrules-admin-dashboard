@@ -4,6 +4,7 @@ import { DashboardLayout } from './layouts/DashboardLayout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import PublicRoute from './components/auth/PublicRoute'
 
+
 const SignIn = lazy(() => import('./pages/SignIn').then((m) => ({ default: m.SignIn })))
 const ForgotPassword = lazy(() =>
   import('./pages/ForgotPassword').then((m) => ({ default: m.ForgotPassword }))
@@ -12,6 +13,7 @@ const UserManagement = lazy(() =>
   import('./pages/UserManagement').then((m) => ({ default: m.UserManagement }))
 )
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
+const UserMessages = lazy(() => import('./pages/UserMessages').then((m) => ({ default: m.UserMessages })))
 const ReportedContent = lazy(() =>
   import('./pages/ReportedContent').then((m) => ({ default: m.ReportedContent }))
 )
@@ -107,6 +109,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <Community />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="userMessages"
+              element={
+                <LazyPage>
+                  <UserMessages />
                 </LazyPage>
               }
             />
