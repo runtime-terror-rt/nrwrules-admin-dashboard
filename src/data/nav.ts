@@ -4,6 +4,7 @@ import type { NavItem } from '../types'
 export const ROUTES = {
   USER_MANAGEMENT: '/user-management',
   COMMUNITY: '/community',
+  USER_MESSAGES: '/userMessages',
   REPORTED_CONTENT: '/reported-content',
   ANNOUNCEMENTS: '/announcements',
   ANALYTICS: '/analytics',
@@ -27,6 +28,7 @@ export const ROUTES = {
 export const navItems: NavItem[] = [
   { id: 'user-mgmt', label: 'User Management', icon: 'users', path: ROUTES.USER_MANAGEMENT },
   { id: 'community', label: 'Community Monitoring', icon: 'chat', path: ROUTES.COMMUNITY },
+  { id: 'user-msg', label: 'User Messages', icon: 'message', path: ROUTES.USER_MESSAGES },
   { id: 'reported', label: 'Reported Content', icon: 'warning', path: ROUTES.REPORTED_CONTENT },
   { id: 'announcements', label: 'Announcements', icon: 'bell', path: ROUTES.ANNOUNCEMENTS },
   { id: 'analytics', label: 'Analytics', icon: 'chart', path: ROUTES.ANALYTICS },
