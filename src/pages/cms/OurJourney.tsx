@@ -1,31 +1,58 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 import {
   useGetJourneysQuery,
   useDeleteJourneyMutation,
 } from '../../redux/features/api/admin/journey'
-import { Card, Icon, PageHeader } from '../../components'
+import { Button, Card, PageHeader } from '../../components'
 import SkeletonLoading from '@/components/SkeletonLoading'
-import DeleteJourneyModal from '@/components/modal/DeleteJourneyModal'
 import JourneyModal from '@/components/modal/JourneyModal'
+import { Edit, Trash2, Plus } from 'lucide-react'
 
 export function CmsOurJourney() {
   const { data: journeys, isLoading } = useGetJourneysQuery(undefined)
-  const [deleteJourney, { isLoading: isDeleting }] = useDeleteJourneyMutation()
+  const [deleteJourney] = useDeleteJourneyMutation()
+
+  const handleDelete = async (id: number) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteJourney(id).unwrap()
+          Swal.fire(
+            'Deleted!',
+            'Milestone has been deleted.',
+            'success'
+          )
+        } catch (error: any) {
+          toast.error(error?.data?.message || 'Failed to delete milestone')
+        }
+      }
+    })
+  }
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <PageHeader
-          title="Our Journey"
-          subtitle="CMS · Journey"
-          description="Manage the growth milestones of the Mamabot ecosystem."
-        />
-        {journeys?.data.length === 0 && (
+       <PageHeader
+        title="Our Journey"
+        subtitle="CMS · Journey"
+        description="Manage the growth milestones of the Mamabot ecosystem."
+        action={
           <JourneyModal>
-            <button className="bg-rose-500 text-white px-4 py-2 rounded-lg">+ Add Milestone</button>
+            <Button className="bg-[#E91E63] w-full sm:w-auto">
+              <Plus size={18}/>
+               Add Milestone
+            </Button>
           </JourneyModal>
-        )}
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1  gap-6">
         {isLoading ? (
@@ -63,21 +90,20 @@ export function CmsOurJourney() {
                 <JourneyModal initialData={m}>
                   <button
                     type="button"
-                    className="p-1.5 text-gray-400! hover:text-sky-500! transition-colors"
+                    className="p-1.5 text-sky-500 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
                     aria-label="Edit"
                   >
-                    <Icon name="edit" size={18} className="cursor-pointer" />
+                    <Edit size={18} />
                   </button>
                 </JourneyModal>
-                <DeleteJourneyModal onConfirm={() => deleteJourney(m.id)} isLoading={isDeleting}>
-                  <button
-                    type="button"
-                    className="p-1.5 text-gray-400! hover:text-red-500! transition-colors"
-                    aria-label="Delete"
-                  >
-                    <Icon name="trash" size={18} className="text-red-500! cursor-pointer" />
-                  </button>
-                </DeleteJourneyModal>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(m.id)}
+                  className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                  aria-label="Delete"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
             </Card>
           ))

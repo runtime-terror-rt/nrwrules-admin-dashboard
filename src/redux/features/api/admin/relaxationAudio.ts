@@ -13,9 +13,18 @@ const relaxationAudioApi = baseApi.injectEndpoints({
     // 🔹 Upload relaxation audio
     uploadRelaxationAudio: builder.mutation({
       query: (formData) => ({
-        url: '/relaxation-audio/upload',
+        url: '/relaxation-audios/upload',
         method: 'POST',
         body: formData,
+      }),
+      invalidatesTags: ['RelaxationAudio'],
+    }),
+
+    // 🔹 Delete relaxation audio
+    deleteRelaxationAudio: builder.mutation({
+      query: (id) => ({
+        url: `/relaxation-audios/${id}`,
+        method: 'DELETE',
       }),
       invalidatesTags: ['RelaxationAudio'],
     }),
@@ -25,6 +34,7 @@ const relaxationAudioApi = baseApi.injectEndpoints({
 export const {
   useGetRelaxationAudiosQuery,
   useUploadRelaxationAudioMutation,
+  useDeleteRelaxationAudioMutation,
 } = relaxationAudioApi
 
 export default relaxationAudioApi

@@ -1,15 +1,17 @@
 import SkeletonLoading from '@/components/SkeletonLoading'
-import { useCreateUpdateMissionMutation } from '@/redux/features/api/admin/mission'
 import {
   useDeleteTestimonialMutation,
   useGetTestimonialsQuery,
+  useUpsertTestimonialMutation,
 } from '@/redux/features/api/admin/testimonials'
 import { Edit, Trash2, Quote, Plus } from 'lucide-react'
 import { Button, Icon, PageHeader } from '../../components'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import Swal from 'sweetalert2'
 
 const TestimonialModal = ({ onClose, initialData }: any) => {
-  const [createUpdateTestimonial, { isLoading }] = useCreateUpdateMissionMutation()
+  const [upsertTestimonial, { isLoading }] = useUpsertTestimonialMutation()
 
   const [formData, setFormData] = useState({
     author_name: '',
@@ -46,8 +48,16 @@ const TestimonialModal = ({ onClose, initialData }: any) => {
       data.append('image', file)
     }
 
-    await createUpdateTestimonial(data).unwrap()
-    onClose()
+    try {
+      const res = await upsertTestimonial(data).unwrap()
+      if(res.success){
+        toast.success(res.message || 'Testimonial saved successfully')
+        onClose()
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to save testimonial')
+      console.error(error)
+    }
   }
 
   const previewImage = file ? URL.createObjectURL(file) : initialData?.image || null
@@ -153,6 +163,35 @@ export const CmsTestimonials = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<any>(null)
 
+  const handleDelete = (id: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteTestimonial(id).unwrap()
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success"
+          });
+        } catch (error: any) {
+             Swal.fire({
+            title: "Error!",
+            text: error?.data?.message || "Something went wrong.",
+            icon: "error"
+          });
+        }
+      }
+    });
+  }
+
   return (
     <div>
       {/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -203,7 +242,7 @@ export const CmsTestimonials = () => {
               <div className="flex-1 flex flex-col justify-center text-center sm:text-left">
                 <p className="italic text-gray-600 text-sm md:text-base leading-relaxed mb-4">"{item.description}"</p>
                 <div>
-                  <h3 className="font-bold text-gray-900">{item.author_name}</h3>
+                  <h3 className="font-bold text-gray-900!">{item.author_name}</h3>
                   <p className="text-sky-500 text-xs font-semibold uppercase tracking-wider">{item.author_title}</p>
                 </div>
               </div>
@@ -221,7 +260,7 @@ export const CmsTestimonials = () => {
                 </button>
 
                 <button 
-                  onClick={() => deleteTestimonial(item.id)}
+                  onClick={() => handleDelete(item.id)}
                   className="p-2.5 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                   title="Delete"
                 >
