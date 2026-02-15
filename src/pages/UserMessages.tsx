@@ -119,9 +119,6 @@ export function UserMessages() {
               <dt className="font-medium text-gray-500">Message</dt>
               <dd>{selectedMessage.message}</dd>
 
-              <dt className="font-medium text-gray-500">Attachment</dt>
-              <dd>{selectedMessage.attachment ?? 'None'}</dd>
-
               <dt className="font-medium text-gray-500">Agreed to Privacy</dt>
               <dd>{selectedMessage.agreed_to_privacy ? 'Yes' : 'No'}</dd>
 
