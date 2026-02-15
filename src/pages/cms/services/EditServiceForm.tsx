@@ -22,7 +22,11 @@ function EditServiceForm({ form, onChange, onFile }: any) {
       </div>
 
       <div className="space-y-4">
-        <UploadBox label="Thumbnail Image" onFile={(f) => onFile('thumbnail_img', f)} />
+        <UploadBox 
+            label="Thumbnail Image" 
+            onFile={(f) => onFile('thumbnail_img', f)} 
+            preview={form.thumbnail_img}
+        />
 
         <label className="block text-sm font-medium text-gray-700">Button Text</label>
         <input

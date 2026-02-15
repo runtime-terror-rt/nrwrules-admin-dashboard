@@ -3,11 +3,14 @@ import SkeletonLoading from '@/components/SkeletonLoading'
 import {
   useDeleteTeamMemberMutation,
   useGetTeamsQuery,
+  useToggleStatusMutation,
   useUpsertTeamMemberMutation,
 } from '@/redux/features/api/admin/team'
-import { Edit, Plus, Trash2, User } from 'lucide-react'
+import { Edit, Plus, Trash2 } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
+import { ASSETS } from '@/constants/assets'
+import { toast } from 'sonner'
 
 const TeamMemberModal = ({ onClose, initialData }: any) => {
   const [upsertMember, { isLoading }] = useUpsertTeamMemberMutation()
@@ -24,7 +27,10 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
 
   useEffect(() => {
     if (initialData) {
-      setFormData({ ...initialData })
+      setFormData({
+        ...initialData,
+        status: String(initialData.status ?? '1') // Ensure status is string '1' or '0'
+      })
     }
   }, [initialData])
 
@@ -41,9 +47,16 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
     data.append('status', formData.status)
     if (file) data.append('thumbnail_img', file)
 
-    await upsertMember(data)
-    onClose()
+    try {
+      await upsertMember(data).unwrap()
+      toast.success(initialData ? 'Team member updated successfully' : 'Team member added successfully')
+      onClose()
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to save team member')
+    }
   }
+
+  const previewImage = file ? URL.createObjectURL(file) : (initialData?.thumbnail_img || null)
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
@@ -66,7 +79,7 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
               onClick={handleSubmit}
               className="flex-1 sm:flex-none px-6 py-2.5 bg-rose-500 text-white rounded-xl hover:bg-rose-600 shadow-lg shadow-rose-100 transition-all active:scale-95"
             >
-              {isLoading ? 'Saving...' : 'Update'}
+              {isLoading ? 'Saving...' : (initialData ? 'Update' : 'Add')}
             </button>
           </div>
         </div>
@@ -125,10 +138,19 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
               <label className="block text-sm font-semibold mb-1">Profile Photo</label>
               <div className="flex gap-4">
                 <div className="w-24 h-24 bg-gray-200 rounded-xl overflow-hidden">
-                  {file ? (
-                    <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" />
+                  {previewImage ? (
+                    <img 
+                      src={previewImage} 
+                      className="object-cover w-full h-full" 
+                      onError={(e) => {
+                        e.currentTarget.src = ASSETS.images.medic
+                      }}
+                    />
                   ) : (
-                    <div className="p-4 bg-gray-100 h-full w-full" />
+                   <img 
+                      src={ASSETS.images.medic} 
+                      className="object-cover w-full h-full" 
+                    />
                   )}
                 </div>
                 <label className="flex-1 border-2 border-dashed border-sky-100 rounded-xl flex flex-col items-center justify-center cursor-pointer text-sky-400 text-xs">
@@ -167,8 +189,10 @@ const TeamMemberModal = ({ onClose, initialData }: any) => {
 }
 
 export const CmsTeam = () => {
+  const [searchTerm, setSearchTerm] = useState('')
   const { data: teams, isLoading } = useGetTeamsQuery({})
   const [deleteMember] = useDeleteTeamMemberMutation()
+  const [toggleStatus] = useToggleStatusMutation()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMember, setSelectedMember] = useState(null)
@@ -222,6 +246,15 @@ export const CmsTeam = () => {
       })
   }
 
+  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      await toggleStatus({ id, is_active: !currentStatus }).unwrap()
+      toast.success('Status updated successfully')
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to update status')
+    }
+  }
+
   return (
     <>
     
@@ -243,6 +276,8 @@ export const CmsTeam = () => {
         <input
           type="text"
           placeholder="Search members..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-3 pl-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-400"
         />
         <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
@@ -256,7 +291,11 @@ export const CmsTeam = () => {
           {teams?.data?.teams?.length === 0 ? (
             <p>No team members found.</p>
           ) : (
-            teams?.data?.teams?.map((member: any) => (
+            teams?.data?.teams
+              ?.filter((member: any) => 
+                searchTerm === '' || member.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((member: any) => (
               <div
                 key={member.id}
                 className="w-full md:w-78 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md overflow-hidden flex flex-col items-center p-6 text-center"
@@ -266,10 +305,16 @@ export const CmsTeam = () => {
                     src={member.thumbnail_img || 'https://via.placeholder.com/150'}
                     alt={member.name}
                     className="w-32 h-32 rounded-full object-cover mb-4"
+                    onError={(e) => {
+                      e.currentTarget.src = ASSETS.images.medic
+                    }}
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 mb-4 flex items-center justify-center">
-                    <User className="w-20 h-20   text-gray-400" />
+                  <div className="w-32 h-32 rounded-full bg-gray-200 mb-4 flex items-center justify-center overflow-hidden">
+                     <img 
+                      src={ASSETS.images.medic} 
+                      className="object-cover w-full h-full" 
+                    />
                   </div>
                 )}
 
@@ -278,6 +323,31 @@ export const CmsTeam = () => {
                 <p className="text-gray-500 text-xs line-clamp-2 mb-6 h-8">
                   {member.long_description}
                 </p>
+
+                {/* ... existing code ... */}
+                 
+                 {/* Define isActive helper for safer boolean check */}
+                 {(() => {
+                   // API returns 'status' which can be 1, '1', true, etc.
+                   // The toggle mutation expects 'is_active' boolean.
+                   const isActive = member.status === 1 || member.status === '1' || member.status === true
+                   return (
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {isActive ? 'Active' : 'Inactive'}
+                      </span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={isActive}
+                          onChange={() => handleToggleStatus(member.id, isActive)}
+                        />
+                        <div className={`w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${isActive ? 'peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:bg-sky-500' : ''}`}></div>
+                      </label>
+                    </div>
+                   )
+                 })()}
 
                 <div className="flex w-full gap-2 mt-auto">
                   <button

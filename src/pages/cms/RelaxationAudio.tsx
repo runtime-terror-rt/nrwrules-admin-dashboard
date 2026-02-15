@@ -4,18 +4,24 @@ import { Button, PageHeader } from '../../components'
 import {
   useGetRelaxationAudiosQuery,
   useUploadRelaxationAudioMutation,
+  useDeleteRelaxationAudioMutation,
 } from '../../redux/features/api/admin/relaxationAudio'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Music, Link, Edit, Trash2 } from 'lucide-react'
+import { Music, Link, Edit, Trash2, Plus, Play, Pause } from 'lucide-react'
 import { toast } from 'sonner'
 import SkeletonLoading from '@/components/SkeletonLoading'
+
+import Swal from 'sweetalert2'
 
 export function RelaxationAudio() {
   const { data, isLoading } = useGetRelaxationAudiosQuery()
   const [uploadAudio, { isLoading: isSaving }] = useUploadRelaxationAudioMutation()
+  const [deleteAudio] = useDeleteRelaxationAudioMutation()
 
   const [open, setOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [playingId, setPlayingId] = useState<number | null>(null)
+  const [audio] = useState(typeof Audio !== 'undefined' ? new Audio() : null)
   const [form, setForm] = useState({
     title: '',
     is_active: 1,
@@ -66,10 +72,28 @@ export function RelaxationAudio() {
   }
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this audio track?')) {
-      console.log('Delete feature (design only):', id)
-      toast.info('Delete functionality design implemented')
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+            await deleteAudio(id).unwrap()
+            Swal.fire(
+              'Deleted!',
+              'Your audio track has been deleted.',
+              'success'
+            )
+        } catch (error: any) {
+            toast.error(error?.data?.message || 'Failed to delete audio')
+        }
+      }
+    })
   }
 
   const handleToggleStatus = async (item: any) => {
@@ -77,15 +101,42 @@ export function RelaxationAudio() {
     toast.info('Status toggle design implemented')
   }
 
+  const togglePlay = (item: any) => {
+    if (!audio) return
+
+    if (playingId === item.id) {
+      audio.pause()
+      setPlayingId(null)
+    } else {
+      if (!item.audio_url) {
+        toast.error('No audio URL available')
+        return
+      }
+      audio.src = item.audio_url
+      audio.play().catch(err => {
+        console.error('Playback error:', err)
+        toast.error('Error playing audio')
+        setPlayingId(null)
+      })
+      setPlayingId(item.id)
+      
+      audio.onended = () => {
+        setPlayingId(null)
+      }
+    }
+  }
+
   return (
     <>
-      <PageHeader
+    <PageHeader
         title="Relaxation Audio"
         subtitle="CMS · Relaxation Audio"
         description="Manage relaxation audio files, music, and meditations."
         action={
-          <Button onClick={() => openEditor()} className="px-4 py-2 bg-pink-500 text-white rounded-lg text-sm font-medium hover:bg-pink-600 transition-colors">
-            + Add New Audio
+          <Button onClick={() => openEditor()} className="bg-[#E91E63] w-full sm:w-auto">
+          
+            <Plus size={18}/>
+             Add New Audio
           </Button>
         }
       />
@@ -128,9 +179,16 @@ export function RelaxationAudio() {
                   <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-500">
-                          <Music size={20} />
-                        </div>
+                        <button
+                          onClick={() => togglePlay(item)}
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all ${
+                            playingId === item.id 
+                              ? 'bg-pink-500 text-white shadow-lg shadow-pink-100 scale-110' 
+                              : 'bg-pink-50 text-pink-500 hover:bg-pink-100 hover:scale-105'
+                          }`}
+                        >
+                          {playingId === item.id ? <Pause size={20} fill="currentColor" /> : <Play size={20} className="ml-0.5" fill="currentColor" />}
+                        </button>
                         <span className="font-semibold text-gray-900 whitespace-nowrap">{item.title}</span>
                       </div>
                     </td>
@@ -193,9 +251,16 @@ export function RelaxationAudio() {
             <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-500">
-                    <Music size={20} />
-                  </div>
+                  <button
+                    onClick={() => togglePlay(item)}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all ${
+                      playingId === item.id 
+                        ? 'bg-pink-500 text-white shadow-lg shadow-pink-100 scale-105' 
+                        : 'bg-pink-50 text-pink-500'
+                    }`}
+                  >
+                    {playingId === item.id ? <Pause size={20} fill="currentColor" /> : <Play size={20} className="ml-0.5" fill="currentColor" />}
+                  </button>
                   <div>
                     <h3 className="font-bold text-gray-900 leading-tight">{item.title}</h3>
                     <button

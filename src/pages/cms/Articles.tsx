@@ -9,10 +9,14 @@ import {
   useUpsertArticleMutation,
 } from '@/redux/features/api/admin/articles'
 import { PageHeader } from '@/components'
+import { toast } from 'sonner'
+import Swal from 'sweetalert2'
 
 const ArticleModal = ({ initialData, onCancel }: any) => {
   const { data: catResponse } = useGetCategoriesQuery({})
   const [upsertArticle, { isLoading }] = useUpsertArticleMutation()
+
+  console.log(catResponse,"catresponse")
 
   const [formData, setFormData] = useState({
     title: '',
@@ -21,7 +25,9 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
     category_id: '',
     phase_type: 'pregnancy',
     status: 'published',
-    week: '13',
+    week: '1',
+    delivery_type: 'vaginal_delivary',
+    postpartum_day: '1',
   })
 
   const [mainImg, setMainImg] = useState<File | null>(null)
@@ -36,7 +42,9 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
         category_id: initialData.category_id || '',
         phase_type: initialData.phase_type || 'pregnancy',
         status: initialData.status || 'published',
-        week: initialData.week?.toString() || '13',
+        week: initialData.week?.toString() || '1',
+        delivery_type: initialData.delivery_type || 'vaginal_delivary',
+        postpartum_day: initialData.postpartum_day?.toString() || '1',
       })
     }
   }, [initialData])
@@ -46,13 +54,26 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
     const data = new FormData()
     if (initialData?.id) data.append('id', initialData.id)
 
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value))
+    Object.entries(formData).forEach(([key, value]) => {
+      // Conditionally append fields based on phase
+      if (key === 'week' && isPostpartumPhase) return
+      if ((key === 'delivery_type' || key === 'postpartum_day') && !isPostpartumPhase) return
+      data.append(key, value)
+    })
+
     if (mainImg) data.append('main_img', mainImg)
     if (thumbImg) data.append('thumb_img', thumbImg)
 
-    await upsertArticle(data)
-    onCancel()
+    try {
+      await upsertArticle(data).unwrap()
+      toast.success(initialData ? 'Article updated successfully' : 'Article published successfully')
+      onCancel()
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to save article')
+    }
   }
+
+  const isPostpartumPhase = formData.phase_type === 'postpartum'
 
   return (
     <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 backdrop-blur-sm">
@@ -140,16 +161,46 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
                   <option value="draft">Draft</option>
                 </select>
               </div>
-              <div className="space-y-1 text-gray-700">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Week Number</label>
-                <input
-                  required
-                  type="number"
-                  className="w-full p-3.5 border border-transparent bg-gray-50 focus:bg-white focus:border-sky-200 rounded-2xl transition-all outline-none"
-                  value={formData.week}
-                  onChange={(e) => setFormData({ ...formData, week: e.target.value })}
-                />
-              </div>
+              
+              {!isPostpartumPhase ? (
+                <div className="space-y-1 text-gray-700">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Week Number</label>
+                  <input
+                    required
+                    type="number"
+                    min="1"
+                    className="w-full p-3.5 border border-transparent bg-gray-50 focus:bg-white focus:border-sky-200 rounded-2xl transition-all outline-none"
+                    value={formData.week}
+                    onChange={(e) => setFormData({ ...formData, week: e.target.value })}
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-1 text-gray-700">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Delivery Type</label>
+                    <select
+                      required
+                      className="w-full p-3.5 border border-transparent bg-gray-50 focus:bg-white focus:border-sky-200 rounded-2xl transition-all outline-none appearance-none cursor-pointer"
+                      value={formData.delivery_type}
+                      onChange={(e) => setFormData({ ...formData, delivery_type: e.target.value })}
+                    >
+                      <option value="vaginal_delivary">Vaginal Delivery</option>
+                      <option value="cesarean_delivery">Cesarean Delivery</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1 text-gray-700">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Postpartum Day</label>
+                    <input
+                      required
+                      type="number"
+                      min="1"
+                      className="w-full p-3.5 border border-transparent bg-gray-50 focus:bg-white focus:border-sky-200 rounded-2xl transition-all outline-none"
+                      value={formData.postpartum_day}
+                      onChange={(e) => setFormData({ ...formData, postpartum_day: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-8 pt-4">
@@ -163,6 +214,8 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
                   />
                   {thumbImg ? (
                     <img src={URL.createObjectURL(thumbImg)} className="object-cover w-full h-full" />
+                  ) : initialData?.thumb_img ? (
+                    <img src={initialData.thumb_img} className="object-cover w-full h-full" />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImageIcon className="text-gray-300 group-hover:text-sky-400 transition-colors" size={32} />
@@ -181,6 +234,8 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
                   />
                   {mainImg ? (
                     <img src={URL.createObjectURL(mainImg)} className="object-cover w-full h-full" />
+                  ) : initialData?.main_img ? (
+                    <img src={initialData.main_img} className="object-cover w-full h-full" />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <ImageIcon className="text-gray-300 group-hover:text-sky-400 transition-colors" size={32} />
@@ -365,7 +420,26 @@ export const CmsArticles = () => {
                   <span className="md:hidden font-bold text-sm">Edit</span>
                 </button>
                 <button
-                  onClick={() => deleteArticle(article.id)}
+                  onClick={async () => {
+                    Swal.fire({
+                      title: 'Are you sure?',
+                      text: "You won't be able to revert this!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#d33',
+                      cancelButtonColor: '#3085d6',
+                      confirmButtonText: 'Yes, delete it!'
+                    }).then(async (result) => {
+                      if (result.isConfirmed) {
+                        try {
+                          await deleteArticle(article.id).unwrap()
+                          Swal.fire('Deleted!', 'Article has been deleted.', 'success')
+                        } catch (error: any) {
+                          toast.error(error?.data?.message || 'Failed to delete article')
+                        }
+                      }
+                    })
+                  }}
                   className="flex-1 md:flex-none p-3 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors flex items-center justify-center gap-2"
                   title="Delete Article"
                 >
