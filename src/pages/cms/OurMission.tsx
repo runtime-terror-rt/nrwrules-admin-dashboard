@@ -7,19 +7,41 @@ import SkeletonLoading from '@/components/SkeletonLoading'
 import { Card, Icon, PageHeader } from '../../components'
 import { theme } from '../../constants'
 import MissionModal from '@/components/modal/MissionModal'
+import Swal from 'sweetalert2'
+import { ASSETS } from '@/constants/assets'
 
 export function CmsOurMission() {
   const { data: missions, isLoading: missionsLoading } = useGetMissionsQuery(undefined)
   const [deleteMission] = useDeleteMissionMutation()
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this mission?')) {
-      try {
-        await deleteMission(id).unwrap()
-      } catch (error) {
-        console.error('Failed to delete mission:', error)
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteMission(id).unwrap()
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success"
+          });
+        } catch (error) {
+          console.error('Failed to delete mission:', error)
+          Swal.fire({
+            title: "Error!",
+            text: "Something went wrong.",
+            icon: "error"
+          });
+        }
       }
-    }
+    });
   }
 
   return (
@@ -53,9 +75,12 @@ export function CmsOurMission() {
                   <span className="text-sm font-semibold text-gray-500">{i + 1}.</span>
                   <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-sky-100 flex-shrink-0">
                     <img
-                      src={m.icon_url || 'https://via.placeholder.com/150'}
+                      src={m.icon_url || ASSETS.images.logo}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = ASSETS.images.logo
+                      }}
                     />
                   </div>
                   <div>

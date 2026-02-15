@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dialog'
 import { theme } from '../../constants'
 import { useCreateUpdateMissionMutation } from '../../redux/features/api/admin/mission'
+import { toast } from 'sonner'
+import { ASSETS } from '@/constants/assets'
 
 const MissionModal = ({
   children,
@@ -39,7 +41,7 @@ const MissionModal = ({
         description: initialData.description || '',
         sortOrder: initialData.sort_order || 0,
       })
-      setPreview(initialData.icon_url || null)
+      setPreview(initialData.icon_url || ASSETS.images.logo)
     } else {
       setForm({
         title: '',
@@ -70,16 +72,20 @@ const MissionModal = ({
     }
 
     try {
-      await createUpdateMission(formData).unwrap()
-      setOpen(false)
-      // Reset form if it was a create operation
-      if (!initialData) {
-        setForm({ title: '', description: '', sortOrder: 0 })
-        setIcon(null)
-        setPreview(null)
+      const res = await createUpdateMission(formData).unwrap()
+      if (res.success) {
+        toast.success(res.message || 'Mission saved successfully')
+        setOpen(false)
+        // Reset form if it was a create operation
+        if (!initialData) {
+          setForm({ title: '', description: '', sortOrder: 0 })
+          setIcon(null)
+          setPreview(null)
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save mission:', error)
+      toast.error(error?.data?.message || 'Failed to save mission')
     }
   }
 
@@ -139,7 +145,14 @@ const MissionModal = ({
                     onClick={() => document.getElementById('icon-upload')?.click()}
                   >
                     {preview ? (
-                      <img src={preview} alt="Preview" className="h-full w-full object-contain" />
+                      <img 
+                        src={preview} 
+                        alt="Preview" 
+                        className="h-full w-full object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = ASSETS.images.logo
+                        }} 
+                      />
                     ) : (
                       <span className="text-[var(--color-primary)] text-sm">
                         Click or Drag image here

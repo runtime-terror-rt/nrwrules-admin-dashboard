@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
+import Swal from 'sweetalert2'
+import { toast } from 'sonner'
 import { Button, Icon, PageHeader } from '../../components'
 import {
   useGetServiceDataQuery,
@@ -42,8 +44,47 @@ export function Services() {
     fd.append('btn_link', form.btn_link || '')
     if (files.thumbnail_img) fd.append('thumbnail_img', files.thumbnail_img)
 
-    await saveService(fd).unwrap()
-    setOpen(false)
+    try {
+      await saveService(fd).unwrap()
+      toast.success(editing ? 'Service updated successfully' : 'Service created successfully')
+      setOpen(false)
+    } catch (error: any) {
+        toast.error(error?.data?.message || 'Failed to save service')
+    }
+  }
+
+  const handleDelete = (id: number) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+            await deleteService(id).unwrap()
+            Swal.fire(
+              'Deleted!',
+              'Your service has been deleted.',
+              'success'
+            )
+        } catch (error: any) {
+            toast.error(error?.data?.message || 'Failed to delete service')
+        }
+      }
+    })
+  }
+
+  const handleToggleStatus = async (id: number) => {
+    try {
+        await toggleServiceStatus(id).unwrap()
+        toast.success('Service status updated')
+    } catch (error: any) {
+        toast.error(error?.data?.message || 'Failed to update status')
+    }
   }
 
   return (
@@ -106,7 +147,7 @@ export function Services() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button
+                       <button
                         onClick={() => openEditor(s)}
                         className="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
                         title="Edit Service"
@@ -114,21 +155,21 @@ export function Services() {
                         <Icon name="edit" size={18} />
                       </button>
                       <button
-                        onClick={() => deleteService(s.id)}
+                        onClick={() => handleDelete(s.id)}
                         className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Delete Service"
                       >
                         <Trash2 size={18} />
                       </button>
                       <button
-                        onClick={() => toggleServiceStatus(s.id)}
+                        onClick={() => handleToggleStatus(s.id)}
                         className={`ml-2 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider border rounded-xl transition-all ${
                           s.is_active
                             ? 'border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white'
                             : 'border-sky-200 text-sky-600 hover:bg-sky-600 hover:text-white'
                         }`}
                       >
-                        {s.is_active ? 'Deactivate' : 'Activate'}
+                         {s.is_active ? 'Deactivate' : 'Activate'}
                       </button>
                     </div>
                   </td>
