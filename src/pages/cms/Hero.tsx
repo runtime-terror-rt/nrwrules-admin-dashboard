@@ -3,6 +3,8 @@ import { Button, Card, PageHeader } from '../../components'
 import { useGetHeroQuery, useUpdateHeroMutation } from '../../redux/features/api/admin/hero'
 import { useState, useEffect } from 'react'
 import { Check } from 'lucide-react'
+import { toast } from 'sonner'
+import { ASSETS } from '../../constants'
 
 export function CmsHero() {
   const [image, setImage] = useState<File | null>(null)
@@ -45,7 +47,7 @@ export function CmsHero() {
     }))
   }
 
-  const handleUpdateHero = () => {
+  const handleUpdateHero = async () => {
     const formData = new FormData()
     formData.append('title', inputValues.title)
     formData.append('subtitle', inputValues.subtitle)
@@ -55,7 +57,14 @@ export function CmsHero() {
     if (image) {
       formData.append('image', image)
     }
-    updateHero(formData)
+    
+    try {
+      await updateHero(formData).unwrap()
+      toast.success('Hero section updated successfully')
+      setImage(null)
+    } catch (err: any) {
+      toast.error(err?.data?.message || 'Failed to update hero section')
+    }
   }
 
   if (isLoading) {
@@ -161,20 +170,24 @@ export function CmsHero() {
           <section>
             <h2 className="mb-4 text-base font-semibold text-gray-700!">Image URL</h2>
             <div className="flex gap-3">
-              {data?.data?.image !== null ? (
-                <div className="h-24 w-24 shrink-0 rounded-lg bg-gray-200">
-                  <img src={data?.data?.image} alt="" />
-                </div>
-              ) : (
-                <div className="h-24 w-24 shrink-0 rounded-lg text-gray-400 bg-gray-200 flex justify-center items-center">
-                  No image
-                </div>
-              )}
+              <div className="h-24 w-24 shrink-0 rounded-lg bg-gray-200 overflow-hidden border border-gray-100">
+                <img 
+                  src={image ? URL.createObjectURL(image) : (data?.data?.image || ASSETS.images.placeholder)} 
+                  alt="Hero" 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== ASSETS.images.placeholder) {
+                      target.src = ASSETS.images.placeholder;
+                    }
+                  }}
+                />
+              </div>
               <div
                 onClick={() => document.getElementById('image')?.click()}
-                className="flex min-h-24 flex-1 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-blue-50/50 text-sm text-gray-400"
+                className="flex min-h-24 flex-1 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-blue-50/50 text-sm text-gray-400 cursor-pointer hover:bg-blue-100/50 transition-colors"
               >
-                Click or drag image here
+                {image ? 'Change selected image' : 'Click or drag image here'}
               </div>
               <input
                 onChange={handleImage}
