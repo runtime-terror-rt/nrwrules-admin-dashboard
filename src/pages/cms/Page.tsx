@@ -15,16 +15,19 @@ import TimeConverter from '@/components/TimeConverter'
 import { Plus } from 'lucide-react'
 import RichTextEditor from '@/components/TextEditor/RichTextEditor'
 import { useEditPageMutation } from '@/redux/features/api/admin/EditPage'
-import toast, { Toaster } from 'react-hot-toast'
+import { toast } from 'sonner'
+import Swal from 'sweetalert2'
 // Page Form Modal
 const PageFormModal = ({
   children,
   initialData,
   onSave,
+  isLoading,
 }: {
   children: React.ReactNode
   initialData?: any
-  onSave: (form: any) => void
+  onSave: (form: any) => Promise<boolean>
+  isLoading?: boolean
 }) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({
@@ -59,9 +62,11 @@ const PageFormModal = ({
     },
   })
 
-  const handleSubmit = () => {
-    onSave(form)
-    setOpen(false)
+  const handleSubmit = async () => {
+    const success = await onSave(form)
+    if (success) {
+      setOpen(false)
+    }
   }
 
   return (
@@ -204,9 +209,11 @@ const PageFormModal = ({
             </DialogClose>
             <button
               onClick={handleSubmit}
-              className="px-8 py-2 bg-[#E91E63] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+              disabled={isLoading}
+              className="px-8 py-2 bg-[#E91E63] text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
             >
-              {initialData?.id ? 'Update' : 'Create'}
+              {isLoading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {isLoading ? 'Processing...' : (initialData?.id ? 'Update' : 'Create')}
             </button>
           </div>
         </div>
@@ -222,41 +229,83 @@ export function CmsPage() {
   const [deletePage] = useDeletePageMutation()
   const [editPage] = useEditPageMutation()
 
+  const [isSaving, setIsSaving] = useState(false)
+
   const handleSave = async (formData: any, pageId?: number) => {
+    setIsSaving(true)
     try {
       if (pageId) {
-        //  Update existing page
         await editPage({ pageId, body: formData }).unwrap()
         toast.success('Page updated successfully!')
       } else {
-        //  Create new page
         await createUpdate(formData).unwrap()
         toast.success('Page created successfully!')
       }
+      return true
     } catch (err) {
       console.error(err)
+      return false
+    } finally {
+      setIsSaving(false)
     }
   }
   const handleDelete = async (pageId: number) => {
-    try {
-      await deletePage(pageId).unwrap()
-      toast.success('Page deleted successfully!')
-    } catch (err: any) {
-      console.error(err)
-      toast.error(err?.data?.message || 'Failed to delete page!')
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#E91E63',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      customClass: {
+        popup: 'rounded-[2rem]',
+        confirmButton: 'rounded-xl px-6 py-3',
+        cancelButton: 'rounded-xl px-6 py-3',
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deletePage(pageId).unwrap()
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Page has been removed.',
+            icon: 'success',
+            confirmButtonColor: '#E91E63',
+            customClass: {
+              popup: 'rounded-[2rem]',
+              confirmButton: 'rounded-xl px-6 py-3',
+            },
+          })
+        } catch (err: any) {
+          console.error(err)
+          Swal.fire({
+            title: 'Error!',
+            text: err?.data?.message || 'Failed to delete page!',
+            icon: 'error',
+            confirmButtonColor: '#E91E63',
+            customClass: {
+              popup: 'rounded-[2rem]',
+              confirmButton: 'rounded-xl px-6 py-3',
+            },
+          })
+        }
+      }
+    })
   }
 
   return (
     <div className="p-4">
-      <Toaster position="top-right" reverseOrder={false} />
       <PageHeader
         title="Pages"
         subtitle="CMS · Page Settings"
         description="Manage static pages and SEO."
         action={
-          <PageFormModal onSave={(data) => handleSave(data)}>
-            <button className="bg-[#E91E63] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium">
+          <PageFormModal onSave={(data) => handleSave(data)} isLoading={isSaving}>
+            <button
+              disabled={isSaving}
+              className="bg-[#E91E63] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium disabled:opacity-50"
+            >
               <Plus size={18} /> Add Page
             </button>
           </PageFormModal>
@@ -304,8 +353,15 @@ export function CmsPage() {
                     <TimeConverter timestamp={page.updated_at} />
                   </td>
                   <td className="px-6 py-4 flex justify-center gap-3">
-                    <PageFormModal initialData={page} onSave={(data) => handleSave(data, page.id)}>
-                      <button className="text-[#E91E63] p-1 hover:bg-pink-50 rounded transition-colors">
+                    <PageFormModal
+                      initialData={page}
+                      onSave={(data) => handleSave(data, page.id)}
+                      isLoading={isSaving}
+                    >
+                      <button
+                        disabled={isSaving}
+                        className="text-[#E91E63] p-1 hover:bg-pink-50 rounded transition-colors disabled:opacity-50"
+                      >
                         <Icon name="edit" size={20} />
                       </button>
                     </PageFormModal>
