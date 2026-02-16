@@ -180,6 +180,7 @@ const PageFormModal = ({
 
               <div>
                 <h3 className="text-sm font-bold text-gray-800! mb-4">SEO Configuration</h3>
+                
                 <label className="block text-xs font-bold text-[#E91E63] mb-1.5 uppercase">
                   Meta Title
                 </label>
