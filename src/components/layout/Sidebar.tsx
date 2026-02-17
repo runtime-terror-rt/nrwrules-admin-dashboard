@@ -295,6 +295,15 @@ function SidebarComponent({
                 <Icon name="credit" size={18} />
                 <span>Subscription</span>
               </NavLink>
+              <NavLink
+                to="/profile"
+                role="menuitem"
+                onClick={() => setUserMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                <Icon name="users" size={18} />
+                <span>Profile</span>
+              </NavLink>
               <div className="my-1 border-t border-gray-100" role="separator" />
               <button
                 type="button"
