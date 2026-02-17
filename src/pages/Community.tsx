@@ -10,6 +10,7 @@ import {
   useGetCommunityPostsPageQuery,
 } from '@/redux/features/api/user/CommunityPost'
 
+
 type FilterTabId = 'all' | 'active' | 'inactive' | 'reported'
 type UICommunityPost = {
   id: string
@@ -38,8 +39,11 @@ export function Community() {
   const [selectedPost, setSelectedPost] = useState<UICommunityPost | null>(null)
 
   /** ------------------ STATS ------------------ */
-  const {  isLoading: communityStatsLoading } =
+  const { data: communityStatsData, isLoading: communityStatsLoading } =
     useGetCommunityStateCardsDataQuery()
+
+
+
   const [deleteCommunityPost, { isLoading: isDeleting }] = useDeleteCommunityPostMutation()
 
   /** ------------------ POSTS API ------------------ */
@@ -139,31 +143,76 @@ export function Community() {
       />
 
       {communityStatsLoading ? (
-        <SkeletonLoading count={4} height="h-8" />
+        <div className="mb-8">
+          <SkeletonLoading count={4} direction="horizontal" height="h-32" />
+        </div>
       ) : (
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <SearchInput
-            placeholder="Search by author or content..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="min-w-55 max-w-xl flex-1"
-          />
-
-          <div className="flex gap-2">
-            {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActiveFilter(t.id)}
-                className={`rounded-lg px-4 py-2 text-sm ${
-                  activeFilter === t.id ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="p-6 border-[#FEE3ED]">
+            <p className="text-gray-500 text-sm mb-2 font-medium">Total Posts</p>
+            <p className="text-4xl font-bold text-[#d1217b]">
+              {communityStatsData?.data?.total_post?.count ??
+                communityStatsData?.data?.total_post ??
+                communityStatsData?.data?.total_posts?.count ??
+                communityStatsData?.data?.total_posts ??
+                posts.length}
+            </p>
+          </Card>
+          <Card className="p-6 border-[#FEE3ED]">
+            <p className="text-gray-500 text-sm mb-2 font-medium">Total Comments</p>
+            <p className="text-4xl font-bold text-[#d1217b]">
+              {communityStatsData?.data?.total_comment?.count ??
+                communityStatsData?.data?.total_comment ??
+                communityStatsData?.data?.total_comments?.count ??
+                communityStatsData?.data?.total_comments ??
+                posts.reduce((acc, p) => acc + (p.comments || 0), 0)}
+            </p>
+          </Card>
+          <Card className="p-6 border-[#FEE3ED]">
+            <p className="text-gray-500 text-sm mb-2 font-medium">Total Likes</p>
+            <p className="text-4xl font-bold text-[#d1217b]">
+              {communityStatsData?.data?.total_like?.count ??
+                communityStatsData?.data?.total_like ??
+                communityStatsData?.data?.total_likes?.count ??
+                communityStatsData?.data?.total_likes ??
+                posts.reduce((acc, p) => acc + (p.likes || 0), 0)}
+            </p>
+          </Card>
+          <Card className="p-6 border-[#FEE3ED]">
+            <p className="text-gray-500 text-sm mb-2 font-medium">Reported Posts</p>
+            <p className="text-4xl font-bold text-orange-400">
+              {communityStatsData?.data?.reported_post?.count ??
+                communityStatsData?.data?.reported_post ??
+                communityStatsData?.data?.reported_posts?.count ??
+                communityStatsData?.data?.reported_posts ??
+                posts.filter((p) => p.reported).length}
+            </p>
+          </Card>
         </div>
       )}
+
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <SearchInput
+          placeholder="Search by author or content..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="min-w-55 max-w-xl flex-1"
+        />
+
+        <div className="flex gap-2">
+          {(communityFilterTabs as { id: FilterTabId; label: string }[]).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveFilter(t.id)}
+              className={`rounded-lg px-4 py-2 text-sm ${
+                activeFilter === t.id ? 'bg-pink-600 text-white' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="space-y-4">
         {communityPostsLoading ? (

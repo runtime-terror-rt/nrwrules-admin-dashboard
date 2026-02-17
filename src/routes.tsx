@@ -56,6 +56,7 @@ const RelaxationAudio = lazy(() =>
 const Subscription = lazy(() =>
   import('./pages/Subscription').then((m) => ({ default: m.Subscription }))
 )
+const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })))
 
 function PageFallback() {
@@ -261,6 +262,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <Subscription />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <LazyPage>
+                  <Profile />
                 </LazyPage>
               }
             />
