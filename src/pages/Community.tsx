@@ -9,7 +9,7 @@ import {
   useDeleteCommunityPostMutation,
   useGetCommunityPostsPageQuery,
 } from '@/redux/features/api/user/CommunityPost'
-import { CloudCog } from 'lucide-react'
+
 
 type FilterTabId = 'all' | 'active' | 'inactive' | 'reported'
 type UICommunityPost = {
