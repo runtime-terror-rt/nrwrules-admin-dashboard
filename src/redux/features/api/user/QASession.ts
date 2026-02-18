@@ -63,7 +63,7 @@ export const liveQASessionApi = baseApi.injectEndpoints({
       providesTags: ['LiveQASession'],
     }),
 
-    // DELETE (POST /qa-sessions/{id})
+    // DELETE 
     deleteSession: builder.mutation<{ success: boolean; message: string }, number>({
       query: (id) => ({
         url: `/qa-sessions/${id}`,
