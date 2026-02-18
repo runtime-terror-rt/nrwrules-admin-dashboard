@@ -11,7 +11,7 @@ createRoot(rootElement!).render(
   <StrictMode>
     <ReduxProvider>
       <App />
-      <Toaster />
+      <Toaster position="top-right" />
     </ReduxProvider>
   </StrictMode>
 )
