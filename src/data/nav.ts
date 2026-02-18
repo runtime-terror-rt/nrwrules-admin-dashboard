@@ -31,7 +31,7 @@ export const navItems: NavItem[] = [
   {
     id: 'user-msg',
     label: 'FAQs & User Messages',
-    icon: 'help-circle',
+    icon: 'hand-helping',
     path: ROUTES.USER_MESSAGES,
   },
   { id: 'reported', label: 'Reported Content', icon: 'warning', path: ROUTES.REPORTED_CONTENT },
