@@ -70,6 +70,7 @@ export const baseApi = createApi({
     'RelaxationAudio',
     'Doctor',
     'UserMessages',
+    'FAQs',
   ],
   endpoints: () => ({}),
 })
