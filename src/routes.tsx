@@ -4,7 +4,6 @@ import { DashboardLayout } from './layouts/DashboardLayout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import PublicRoute from './components/auth/PublicRoute'
 
-
 const SignIn = lazy(() => import('./pages/SignIn').then((m) => ({ default: m.SignIn })))
 const ForgotPassword = lazy(() =>
   import('./pages/ForgotPassword').then((m) => ({ default: m.ForgotPassword }))
@@ -13,7 +12,9 @@ const UserManagement = lazy(() =>
   import('./pages/UserManagement').then((m) => ({ default: m.UserManagement }))
 )
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
-const UserMessages = lazy(() => import('./pages/UserMessages').then((m) => ({ default: m.UserMessages })))
+const UserMessages = lazy(() =>
+  import('./pages/UserMessages').then((m) => ({ default: m.UserMessages }))
+)
 const ReportedContent = lazy(() =>
   import('./pages/ReportedContent').then((m) => ({ default: m.ReportedContent }))
 )
@@ -32,6 +33,9 @@ const CmsDoctor = lazy(() => import('./pages/cms/Doctor').then((m) => ({ default
 // const CmsSupport = lazy(() =>
 //   import('./pages/cms/Support').then((m) => ({ default: m.CmsSupport }))
 // )
+const CmsLiveQASession = lazy(() =>
+  import('./pages/cms/LiveQASession').then((m) => ({ default: m.LiveQASession }))
+)
 const CmsTeam = lazy(() => import('./pages/cms/Team').then((m) => ({ default: m.CmsTeam })))
 const CmsTestimonials = lazy(() =>
   import('./pages/cms/Testimonials').then((m) => ({ default: m.CmsTestimonials }))
@@ -174,6 +178,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <CmsDoctor />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="cms/live-qa-session"
+              element={
+                <LazyPage>
+                  <CmsLiveQASession />
                 </LazyPage>
               }
             />
