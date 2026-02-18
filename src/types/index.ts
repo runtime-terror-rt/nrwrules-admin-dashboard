@@ -3,6 +3,8 @@
  * Use these across components, hooks, and pages for consistency.
  */
 
+import type { LucideIcon } from 'lucide-react'
+
 /** User record as shown in the directory table */
 export interface User {
   id?: string
@@ -25,7 +27,7 @@ export interface NavItemChild {
 export interface NavItem {
   id: string
   label: string
-  icon: string
+  icon: string 
   path: string
   children?: NavItemChild[]
 }
