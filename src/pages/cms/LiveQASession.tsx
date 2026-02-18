@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { Button, PageHeader, Modal } from '@/components'
-import { Plus, Eye } from 'lucide-react'
+import { Plus, Eye, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   useCreateSessionMutation,
+  useDeleteSessionMutation,
   useGetSessionsQuery,
   type QASessionData,
 } from '@/redux/features/api/user/QASession'
 import { useGetDoctorsQuery } from '@/redux/features/api/admin/doctor'
+import Swal from 'sweetalert2'
 
 export function LiveQASession() {
   const { data, isLoading } = useGetSessionsQuery()
   const [createSession, { isLoading: isCreating }] = useCreateSessionMutation()
   const sessions = data?.data || []
+
+  const [deleteSession] = useDeleteSessionMutation()
 
   // Modal & form states
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -61,6 +65,30 @@ export function LiveQASession() {
       setIsModalOpen(false)
     } catch (err) {
       console.error(err)
+    }
+  }
+  const handleDeleteSession = async (session: QASessionData) => {
+    const result = await Swal.fire({
+      title: 'Delete session?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#E91E63',
+    })
+
+    if (!result.isConfirmed) return
+
+    await toast.promise(deleteSession(session.id).unwrap(), {
+      loading: 'Deleting session...',
+      success: 'QA Session deleted successfully!',
+      error: 'Failed to delete session.',
+    })
+
+    // যদি modal-এ ওই session খোলা থাকে
+    if (selectedSession?.id === session.id) {
+      setSelectedSession(null)
     }
   }
 
@@ -114,14 +142,27 @@ export function LiveQASession() {
                   <td className="p-3">{session.doctor?.name || 'N/A'}</td>
                   <td className="p-3">{new Date(session.start_time).toLocaleString()}</td>
                   <td className="p-3">{new Date(session.end_time).toLocaleString()}</td>
-                  <td className="p-3 flex justify-center">
+                  <td className="p-3 flex justify-center ">
+                    {/* view */}
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => setSelectedSession(session)}
-                      className="flex items-center gap-1"
+                      className=""
                     >
-                      <Eye size={16} /> View
+                      <Eye size={16} />
+                    </Button>
+                    {/* delete */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteSession(session)
+                      }}
+                      className="text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
                     </Button>
                   </td>
                 </tr>

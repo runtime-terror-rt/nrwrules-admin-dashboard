@@ -33,7 +33,7 @@ export interface QASessionData {
 export interface QASessionResponse {
   success: boolean
   message: string
-  data: QASessionData
+  data?: QASessionData
 }
 
 export interface QASessionsListResponse {
@@ -44,7 +44,7 @@ export interface QASessionsListResponse {
 
 export const liveQASessionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Create a new session
+    // CREATE
     createSession: builder.mutation<QASessionResponse, QASessionPayload>({
       query: (body) => ({
         url: '/qa-sessions',
@@ -54,7 +54,7 @@ export const liveQASessionApi = baseApi.injectEndpoints({
       invalidatesTags: ['LiveQASession'],
     }),
 
-    // Retrieve all active sessions
+    // GET LIST
     getSessions: builder.query<QASessionsListResponse, void>({
       query: () => ({
         url: '/qa-sessions',
@@ -62,9 +62,19 @@ export const liveQASessionApi = baseApi.injectEndpoints({
       }),
       providesTags: ['LiveQASession'],
     }),
+
+    // DELETE (POST /qa-sessions/{id})
+    deleteSession: builder.mutation<{ success: boolean; message: string }, number>({
+      query: (id) => ({
+        url: `/qa-sessions/${id}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['LiveQASession'],
+    }),
   }),
   overrideExisting: false,
 })
 
 // Export hooks
-export const { useCreateSessionMutation, useGetSessionsQuery } = liveQASessionApi
+export const { useCreateSessionMutation, useGetSessionsQuery, useDeleteSessionMutation } =
+  liveQASessionApi
