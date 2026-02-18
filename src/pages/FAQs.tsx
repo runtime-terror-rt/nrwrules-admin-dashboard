@@ -26,7 +26,7 @@ const FAQs = () => {
   const faqs: Faq[] = data?.data || []
 
   const [selectedFaq, setSelectedFaq] = useState<Faq | null>(null)
-  const [isEdit, setIsEdit] = useState(false)
+  const [, setIsEdit] = useState(false)
   const [isAdd, setIsAdd] = useState(false)
 
   const [form, setForm] = useState({

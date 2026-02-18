@@ -6,10 +6,8 @@ import { Button, Input } from '../components/ui'
 import { useLoginMutation } from '../redux/features/api/auth/authApi'
 import { useAppDispatch } from '../redux/store/hooks'
 import { setUser } from '../redux/features/slice/authSlice'
+import { useGetWebSettingsQuery } from '@/redux/features/api/websiteData'
 
-/**
- * Sign In — Figma design system: page bg, white card, primary button.
- */
 export function SignIn() {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -17,11 +15,14 @@ export function SignIn() {
   const [password, setPassword] = useState('')
   const [login, { isLoading, error }] = useLoginMutation()
 
+  const { data: webSettingsData, isLoading: isWebSettingsLoading } = useGetWebSettingsQuery()
+  const siteName = webSettingsData?.data?.site_name || 'Mamabot'
+  const logoUrl = webSettingsData?.data?.logo || ASSETS.images.logo
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       const result = await login({ email, password }).unwrap()
-      // result is { success: true, message: "...", data: { token: "...", user: { ... } } }
       if (result.data?.token) {
         localStorage.setItem('accessToken', result.data.token)
         localStorage.setItem('adminUser', JSON.stringify(result.data.user))
@@ -46,11 +47,16 @@ export function SignIn() {
         }}
       >
         <div className="mb-6 flex items-center justify-center gap-2">
-          <img src={ASSETS.images.logo} alt="" className="h-9 w-9" />
-          <span className="text-xl font-bold" style={{ color: theme.color.secondary }}>
-            Mamabot
-          </span>
+          {!isWebSettingsLoading && (
+            <>
+              <img src={logoUrl} alt={siteName} className="h-9 w-9 object-contain" />
+              <span className="text-2xl font-bold" style={{ color: theme.color.primary }}>
+                {siteName}
+              </span>
+            </>
+          )}
         </div>
+
         <h1
           className="mb-1 text-center text-2xl font-bold"
           style={{ color: theme.color.secondary }}
@@ -70,7 +76,7 @@ export function SignIn() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
-              className="mb-1.5 block text-sm font-medium"
+              className="mb-1.5  block text-sm font-medium"
               style={{ color: theme.color.textPrimary }}
             >
               Email
@@ -86,7 +92,7 @@ export function SignIn() {
           </div>
           <div>
             <label
-              className="mb-1.5 block text-sm font-medium"
+              className="mb-1.5 block  text-sm font-medium"
               style={{ color: theme.color.textPrimary }}
             >
               Password
