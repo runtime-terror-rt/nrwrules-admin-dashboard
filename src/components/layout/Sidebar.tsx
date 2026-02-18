@@ -40,6 +40,7 @@ function SidebarComponent({
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const [cmsExpanded, setCmsExpanded] = useState(true)
+  const [communityExpanded, setCommunityExpanded] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const [logout] = useLogOutMutation()
@@ -137,21 +138,25 @@ function SidebarComponent({
           {navItems.map((item) => {
             const hasChildren = !!item.children?.length
             const isCmsItem = item.id === 'cms'
-            const cmsIsActive =
-              location.pathname.startsWith('/cms/') || location.pathname === '/cms'
 
-            if (isCmsItem && hasChildren) {
+            if (hasChildren) {
+              const isExpanded = isCmsItem ? cmsExpanded : item.id === 'community' ? communityExpanded : false
+              const setExpanded = isCmsItem ? setCmsExpanded : item.id === 'community' ? setCommunityExpanded : () => {}
+              
+              const isActive = item.children?.some(c => location.pathname === c.path) || 
+                             (isCmsItem && (location.pathname.startsWith('/cms/') || location.pathname === '/cms'))
+
               return (
                 <div key={item.id} className="mb-0.5">
                   <button
                     type="button"
-                    onClick={() => setCmsExpanded((prev) => !prev)}
+                    onClick={() => setExpanded((prev: boolean) => !prev)}
                     className={`relative flex w-full items-center gap-3 rounded-r-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-                      cmsIsActive ? 'font-semibold' : 'text-gray-700 hover:bg-[#FEE3ED]/50'
+                      isActive ? 'font-semibold' : 'text-gray-700 hover:bg-[#FEE3ED]/50'
                     }`}
-                    style={cmsIsActive ? { backgroundColor: activeBg, color: primary } : undefined}
+                    style={isActive ? { backgroundColor: activeBg, color: primary } : undefined}
                   >
-                    {cmsIsActive && (
+                    {isActive && (
                       <span
                         className="absolute left-0 top-0 h-full w-1 rounded-r"
                         style={{ backgroundColor: primary }}
@@ -164,14 +169,14 @@ function SidebarComponent({
                     {!isCollapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
                     {!isCollapsed && (
                       <span
-                        className={`shrink-0 transition-transform ${cmsExpanded ? 'rotate-180' : ''}`}
+                        className={`shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                       >
                         <Icon name="chevron-down" size={16} primary />
                       </span>
                     )}
                   </button>
 
-                  {cmsExpanded && item.children && (
+                  {isExpanded && item.children && (
                     <div className="ml-4 mt-0.5 border-l-2 pl-3" style={{ borderColor: activeBg }}>
                       {item.children.map((c) => (
                         <NavLink

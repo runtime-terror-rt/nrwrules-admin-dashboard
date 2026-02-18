@@ -12,6 +12,7 @@ const UserManagement = lazy(() =>
   import('./pages/UserManagement').then((m) => ({ default: m.UserManagement }))
 )
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
+const CommunityGroup = lazy(() => import('./pages/CommunityGroup').then((m) => ({ default: m.CommunityGroup })))
 const UserMessages = lazy(() =>
   import('./pages/UserMessages').then((m) => ({ default: m.UserMessages }))
 )
@@ -110,10 +111,18 @@ export function AppRouter() {
               }
             />
             <Route
-              path="community"
+              path="community-monitoring"
               element={
                 <LazyPage>
                   <Community />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="community-groups"
+              element={
+                <LazyPage>
+                  <CommunityGroup />
                 </LazyPage>
               }
             />

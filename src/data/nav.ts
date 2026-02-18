@@ -3,7 +3,8 @@ import type { NavItem } from '../types'
 /** Route paths and nav config — single source of truth for sidebar + router */
 export const ROUTES = {
   USER_MANAGEMENT: '/user-management',
-  COMMUNITY: '/community',
+  COMMUNITY_MONITORING: '/community-monitoring',
+  COMMUNITY_GROUP: '/community-groups',
   USER_MESSAGES: '/userMessages',
   REPORTED_CONTENT: '/reported-content',
   ANNOUNCEMENTS: '/announcements',
@@ -28,7 +29,16 @@ export const ROUTES = {
 
 export const navItems: NavItem[] = [
   { id: 'user-mgmt', label: 'User Management', icon: 'users', path: ROUTES.USER_MANAGEMENT },
-  { id: 'community', label: 'Community Monitoring', icon: 'chat', path: ROUTES.COMMUNITY },
+  {
+    id: 'community',
+    label: 'Community',
+    icon: 'chat',
+    path: ROUTES.COMMUNITY_MONITORING,
+    children: [
+      { label: 'Community Monitoring', path: ROUTES.COMMUNITY_MONITORING },
+      { label: 'Community Group', path: ROUTES.COMMUNITY_GROUP },
+    ],
+  },
   {
     id: 'user-msg',
     label: 'FAQs & User Messages',
