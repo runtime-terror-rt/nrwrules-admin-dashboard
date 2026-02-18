@@ -12,6 +12,7 @@ export const ROUTES = {
   CMS_WEB_SETTINGS: '/cms/web-settings',
   CMS_SERVICES: '/cms/services',
   CMS_DOCTOR: '/cms/doctor',
+  CMS_LIVE_QA_SESSION: '/cms/live-qa-session',
   // CMS_SUPPORT: '/cms/support',
   CMS_TESTIMONIALS: '/cms/testimonials',
   CMS_TEAM: '/cms/team',
@@ -31,7 +32,11 @@ export const navItems: NavItem[] = [
   {
     id: 'user-msg',
     label: 'FAQs & User Messages',
+<<<<<<< HEAD
     icon: 'hand-helping',
+=======
+    icon: 'question',
+>>>>>>> 33f262542cb172334635ab058b0be3d7cccf9a77
     path: ROUTES.USER_MESSAGES,
   },
   { id: 'reported', label: 'Reported Content', icon: 'warning', path: ROUTES.REPORTED_CONTENT },
@@ -47,6 +52,7 @@ export const navItems: NavItem[] = [
       { label: 'Web settings', path: ROUTES.CMS_WEB_SETTINGS },
       { label: 'Services', path: ROUTES.CMS_SERVICES },
       { label: 'Doctor', path: ROUTES.CMS_DOCTOR },
+      { label: 'Live Q&A Session', path: ROUTES.CMS_LIVE_QA_SESSION },
       // { label: 'Support', path: ROUTES.CMS_SUPPORT },
       { label: 'Team', path: ROUTES.CMS_TEAM },
       { label: 'Testimonials', path: ROUTES.CMS_TESTIMONIALS },

@@ -9,6 +9,7 @@ export const ASSETS = {
     search: `${BASE}/icons/search.svg`,
     users: `${BASE}/icons/users.svg`,
     chat: `${BASE}/icons/chat.svg`,
+    question: `${BASE}/icons/question.svg`,
     warning: `${BASE}/icons/warning.svg`,
     megaphone: `${BASE}/icons/megaphone.svg`,
     bell: `${BASE}/icons/bell.svg`,
