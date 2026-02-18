@@ -6,7 +6,8 @@ import { Icon } from '../ui'
 import { useAppDispatch } from '../../redux/store/hooks'
 import { logOut } from '../../redux/features/slice/authSlice'
 import { useLogOutMutation } from '@/redux/features/api/auth/authApi'
-import logo from '../../../public/assets/icon.png'
+// import logo from '../../../public/assets/icon.png'
+import { useGetWebSettingsQuery } from '@/redux/features/api/websiteData'
 
 export interface SidebarProps {
   brand: string
@@ -42,6 +43,13 @@ function SidebarComponent({
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const [logout] = useLogOutMutation()
+  const { data: webSettingsData, isLoading: isWebSettingsLoading } = useGetWebSettingsQuery()
+
+  const siteName = webSettingsData?.data?.site_name || brand
+
+  const logoUrl = webSettingsData?.data?.logo
+    ?  webSettingsData?.data?.logo
+    : null
 
   const handleLogout = () => {
     logout()
@@ -83,7 +91,7 @@ function SidebarComponent({
       <aside
         className={`fixed z-50 flex flex-col overflow-hidden rounded-2xl transition-all duration-300 ease-in-out ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-80 lg:translate-x-0'
-        } ${isCollapsed ? 'w-[80px]' : 'w-64'}`}
+        } ${isCollapsed ? 'w-20' : 'w-64'}`}
         style={{
           top: SIDEBAR_MARGIN,
           left: isMobileOpen ? SIDEBAR_MARGIN : SIDEBAR_MARGIN, // Handled by translate on mobile
@@ -95,14 +103,19 @@ function SidebarComponent({
         <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-4">
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full "
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
               aria-hidden
             >
-              <img src={logo} alt="" className="h-9 w-9 object-contain" />
+              {!isWebSettingsLoading && logoUrl ? (
+                <img src={logoUrl} alt={siteName} className="h-9 w-9 object-contain" />
+              ) : (
+                <div className="h-9 w-9 rounded bg-gray-200 animate-pulse" />
+              )}
             </span>
+
             {!isCollapsed && (
               <span className="truncate font-bold text-lg" style={{ color: primary }}>
-                {brand}
+                {isWebSettingsLoading ? '...' : siteName}
               </span>
             )}
           </div>
