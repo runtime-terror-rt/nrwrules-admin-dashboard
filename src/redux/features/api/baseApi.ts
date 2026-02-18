@@ -71,6 +71,7 @@ export const baseApi = createApi({
     'Doctor',
     'UserMessages',
     'FAQs',
+    'LiveQASession',
   ],
   endpoints: () => ({}),
 })
