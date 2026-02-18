@@ -27,7 +27,7 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
     status: 'published',
     week: '1',
     delivery_type: 'vaginal_delivary',
-    postpartum_day: '1',
+  
   })
 
   const [mainImg, setMainImg] = useState<File | null>(null)
@@ -44,7 +44,7 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
         status: initialData.status || 'published',
         week: initialData.week?.toString() || '1',
         delivery_type: initialData.delivery_type || 'vaginal_delivary',
-        postpartum_day: initialData.postpartum_day?.toString() || '1',
+       
       })
     }
   }, [initialData])
@@ -57,7 +57,9 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
     Object.entries(formData).forEach(([key, value]) => {
       // Conditionally append fields based on phase
       if (key === 'week' && isPostpartumPhase) return
-      if ((key === 'delivery_type' || key === 'postpartum_day') && !isPostpartumPhase) return
+      // Explicitly exclude postpartum_day as per user request
+      if (key === 'postpartum_day') return
+      if (key === 'delivery_type' && !isPostpartumPhase) return
       data.append(key, value)
     })
 
@@ -188,7 +190,7 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
                       <option value="cesarean_delivery">Cesarean Delivery</option>
                     </select>
                   </div>
-                  <div className="space-y-1 text-gray-700">
+{/* <div className="space-y-1 text-gray-700">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Postpartum Day</label>
                     <input
                       required
@@ -198,7 +200,7 @@ const ArticleModal = ({ initialData, onCancel }: any) => {
                       value={formData.postpartum_day}
                       onChange={(e) => setFormData({ ...formData, postpartum_day: e.target.value })}
                     />
-                  </div>
+                  </div> */}
                 </>
               )}
             </div>
