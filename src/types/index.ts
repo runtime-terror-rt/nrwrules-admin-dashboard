@@ -3,7 +3,7 @@
  * Use these across components, hooks, and pages for consistency.
  */
 
-import type { LucideIcon } from 'lucide-react'
+
 
 /** User record as shown in the directory table */
 export interface User {
