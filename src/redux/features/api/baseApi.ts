@@ -74,6 +74,7 @@ export const baseApi = createApi({
     'LiveQASession',
     'CommunityGroup',
     'Wellness',
+    'WebsiteData',
   ],
   endpoints: () => ({}),
 })
