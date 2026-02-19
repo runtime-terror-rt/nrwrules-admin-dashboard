@@ -58,6 +58,9 @@ const CmsPage = lazy(() => import('./pages/cms/Page').then((m) => ({ default: m.
 const RelaxationAudio = lazy(() =>
   import('./pages/cms/RelaxationAudio').then((m) => ({ default: m.RelaxationAudio }))
 )
+const WellnessActivities = lazy(() =>
+  import('./pages/cms/WellnessActivities').then((m) => ({ default: m.WellnessActivities }))
+)
 const Subscription = lazy(() =>
   import('./pages/Subscription').then((m) => ({ default: m.Subscription }))
 )
@@ -275,6 +278,14 @@ export function AppRouter() {
               element={
                 <LazyPage>
                   <RelaxationAudio />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="cms/wellness-self-care"
+              element={
+                <LazyPage>
+                  <WellnessActivities />
                 </LazyPage>
               }
             />

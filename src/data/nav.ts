@@ -24,6 +24,7 @@ export const ROUTES = {
   CMS_HERO: '/cms/hero',
   CMS_PAGE: '/cms/page',
   CMS_RELAXATION_AUDIO: '/cms/relaxation-audio',
+  CMS_WELLNESS_SELF_CARE: '/cms/wellness-self-care',
   SUBSCRIPTION: '/subscription',
 } as const
 
@@ -69,6 +70,7 @@ export const navItems: NavItem[] = [
       { label: 'Hero Section', path: ROUTES.CMS_HERO },
       { label: 'Page Settings', path: ROUTES.CMS_PAGE },
       { label: 'Relaxation Audio', path: ROUTES.CMS_RELAXATION_AUDIO },
+      { label: 'Wellness & Self-Care', path: ROUTES.CMS_WELLNESS_SELF_CARE },
     ],
   },
   {
