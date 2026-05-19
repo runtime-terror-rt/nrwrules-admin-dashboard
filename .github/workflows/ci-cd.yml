@@ -1,0 +1,74 @@
+name: CI CD Docker Hub Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+#env:
+#  IMAGE_REPO: ${{ secrets.DOCKERHUB_REPO }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    #    outputs:
+    #      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+        # Login to Docker Hub
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # Build the Docker image from the current directory
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nrw-admin:latest .
+
+      # Push the built image to the Docker Hub registry
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/nrw-admin:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /root/admin/app
+            
+            # Stop currently running containers and remove orphans (containers not defined in the compose file)
+            # This ensures we start with a clean state and avoid conflicts with old containers.
+            docker compose down --remove-orphans 
+            
+            # Force remove stopped service containers
+            docker compose rm -f 
+            
+            # Pull the latest Docker images defined in the compose file (e.g., the new application image)
+            docker compose pull 
+            
+            # Start the services in detached mode (background) using the updated images
+            docker compose up -d 
+            
+            # Remove unused "dangling" images to free up disk space on the server
+            docker image prune -f
+            echo "Deployment complete"
