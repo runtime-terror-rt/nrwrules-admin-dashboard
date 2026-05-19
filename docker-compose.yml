@@ -5,7 +5,7 @@ services:
     image: softvence/nrw-admin:latest
     restart: always
     ports:
-      - "6020:3001"        # host port 6020 -> container 3000
+      - "6020:3000"        # host port 6020 -> container 3000
     environment:
       - .env
     logging:

@@ -13,7 +13,7 @@ EXPOSE 3000
 
 # Simple healthcheck probing the container's HTTP root
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
-  CMD wget -qO- --timeout=2 http://127.0.0.1:3001/ || exit 1
+  CMD wget -qO- --timeout=2 http://127.0.0.1:3000/ || exit 1
 
 # Run nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
