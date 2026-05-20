@@ -1,0 +1,34 @@
+# Dependencies (reinstalled inside Docker)
+node_modules
+
+# Build output (built inside Docker)
+dist
+
+# Env files (never bake secrets into image)
+.env*
+.env.local
+!.env.example
+
+# Dev / Editor
+.vscode
+.idea
+*.log
+.DS_Store
+
+# Docker files themselves
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github
+
+# Docs & config
+README*
+*.md
+.eslintrc*
+eslint.config.*
+prettier.config.*
+.prettierrc*
+vitest.config.*
+coverage

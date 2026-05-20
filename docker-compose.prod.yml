@@ -1,0 +1,29 @@
+# ── Production / VPS ─────────────────────────────────────────────────
+# Pulls the pre-built image from DockerHub — no source code needed on VPS.
+#
+# Usage on VPS:
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+
+name: nrw-admin
+
+services:
+  app:
+    image: softvence/nrw-admin:${IMAGE_TAG:-latest}
+    container_name: nrw_admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6020:80"   # Only accessible via server Nginx — not public
+    env_file:
+      - .env                  # Production env file on VPS
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

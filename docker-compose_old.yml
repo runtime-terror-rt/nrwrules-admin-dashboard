@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app:
+    image: softvence/nrw-admin:latest
+    restart: always
+    ports:
+      - "6020:3000"        # host port 6020 -> container 3000
+    environment:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M

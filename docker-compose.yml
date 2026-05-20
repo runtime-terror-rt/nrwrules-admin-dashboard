@@ -1,20 +1,36 @@
-version: "3.8"
+# ── Local Development (Mac) ───────────────────────────────────────────
+# Builds the image from source code — no need to pull from DockerHub.
+#
+# Usage:
+#   docker compose up --build          # first run
+#   docker compose up                  # subsequent runs
+#   docker compose down                # stop
+#   open http://localhost:6020
+
+name: nrw-admin
 
 services:
   app:
-    image: softvence/nrw-admin:latest
-    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    image: nrw-admin:local
+    container_name: nrw_admin_local
+    restart: unless-stopped
     ports:
-      - "6020:3000"        # host port 6020 -> container 3000
-    environment:
-      - .env
+      - "6020:80"           # http://localhost:6020
+    env_file:
+      - .env.local          # local env vars (gitignored)
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
