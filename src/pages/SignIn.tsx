@@ -120,9 +120,9 @@ export function SignIn() {
           </Button>
         </form>
       </div>
-      <p className="mt-6 text-center text-sm" style={{ color: theme.color.textSecondary }}>
+      {/* <p className="mt-6 text-center text-sm" style={{ color: theme.color.textSecondary }}>
         Mamabot Admin · Design system Figma 3468-1203
-      </p>
+      </p> */}
     </div>
   )
 }

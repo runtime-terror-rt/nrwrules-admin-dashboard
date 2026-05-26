@@ -1,7 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Card, PageHeader, PageTitle, StatCard } from '../components'
+import { Card, PageHeader, PageTitle, StatCard, AnalyticsToolsTable } from '../components'
 import { dailySummaryCards, userActivityByPhaseData, type StatItem } from '../data'
 import { useGetAnalyticsDataQuery } from '../redux/features/api/admin/communityMonitoring'
+import { useGetAnalyticsToolsQuery, useUpdateAnalyticsToolMutation } from '../redux/features/api/admin/analyticsTools'
+import type { AnalyticsTool } from '../components/AnalyticsToolsTable'
+
+const MOCK_ANALYTICS_TOOLS: AnalyticsTool[] = [
+  {
+    id: 1,
+    tool: 'google_analytics',
+    tracking_id: 'G-XXXXXXXXXXsdfsfdsfds',
+    enabled: 1,
+    created_at: '2026-05-25T03:23:20.000000Z',
+    updated_at: '2026-05-25T03:54:08.000000Z',
+  },
+  {
+    id: 2,
+    tool: 'facebook_pixel',
+    tracking_id: '123456789023sdfsdfsdf',
+    enabled: 0,
+    created_at: '2026-05-25T03:23:20.000000Z',
+    updated_at: '2026-05-25T03:54:08.000000Z',
+  },
+]
 import {
   BarChart,
   Bar,
@@ -69,6 +90,30 @@ function FeatureEngagementChart({ data }: { data: number[] }) {
 
 export function Analytics() {
   const { data, isLoading } = useGetAnalyticsDataQuery({})
+  const { data: fetchedTools } = useGetAnalyticsToolsQuery(undefined)
+  console.log('Fetched analytics tools:', fetchedTools)
+  
+  // Extract tools array from API response, handle both raw array and wrapped { data: [...] } formats
+  let toolsData = MOCK_ANALYTICS_TOOLS
+  if (Array.isArray(fetchedTools)) {
+    toolsData = fetchedTools
+  } else if (fetchedTools && Array.isArray(fetchedTools.data)) {
+    toolsData = fetchedTools.data
+  } else if (fetchedTools && Array.isArray(fetchedTools.analytics)) {
+    toolsData = fetchedTools.analytics
+  }
+
+  const [updateTool] = useUpdateAnalyticsToolMutation()
+
+  const handleEditSubmit = async (tool: AnalyticsTool) => {
+    try {
+      await updateTool(tool).unwrap()
+    } catch (error) {
+      console.error('Failed to update tool:', error)
+      // fallback for demonstration purposes if API is not yet available
+    }
+  }
+
   const analyticsStats: StatItem[] = [
     {
       label: 'Active Users',
@@ -235,6 +280,11 @@ export function Analytics() {
           </div>
         </section>
       )}
+
+      {/* Analytics Tools Table Section */}
+      <section className="mt-8 mb-8">
+        <AnalyticsToolsTable tools={toolsData} onEditSubmit={handleEditSubmit} />
+      </section>
     </>
   )
 }
