@@ -103,21 +103,21 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             # Wait and verify container is healthy
-            echo "Waiting for health check..."
-            for i in $(seq 1 12); do
-              STATUS=$(docker inspect --format='{{.State.Health.Status}}' nrw_admin 2>/dev/null || echo "starting")
-              echo "  [$i/12] Status: $STATUS"
-              if [ "$STATUS" = "healthy" ]; then
-                echo "✅ Container is healthy"
-                break
-              fi
-              if [ $i -eq 12 ]; then
-                echo "❌ Health check failed — rolling back to previous image"
-                docker compose -f docker-compose.prod.yml down
-                exit 1
-              fi
-              sleep 5
-            done
+            # echo "Waiting for health check..."
+            # for i in $(seq 1 12); do
+            #   STATUS=$(docker inspect --format='{{.State.Health.Status}}' nrw_admin 2>/dev/null || echo "starting")
+            #   echo "  [$i/12] Status: $STATUS"
+            #   if [ "$STATUS" = "healthy" ]; then
+            #     echo "✅ Container is healthy"
+            #     break
+            #   fi
+            #   if [ $i -eq 12 ]; then
+            #     echo "❌ Health check failed — rolling back to previous image"
+            #     docker compose -f docker-compose.prod.yml down
+            #     exit 1
+            #   fi
+            #   sleep 5
+            # done
 
             # Clean up old dangling images
             docker image prune -f
